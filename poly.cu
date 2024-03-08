@@ -1,5 +1,11 @@
 #include "geometry.cuh"
 
+#ifdef __CUDACC__
+int a = 0;
+#else
+int a = 1;
+#endif // __CUDACC__
+
 
 
 __host__ __device__ poly::poly() {}
@@ -340,6 +346,61 @@ __host__ __device__ double poly::dir_area() const
 	return s / 2;
 }
 
+
+__global__ void poly_area(seg* segs, double min_x, double min_y, double max_x, double max_y, double* output)
+{
+	int idx = threadIdx.x + blockIdx.x * blockDim.x;
+	int x = min_x + idx;
+	if (x >= max_x)
+	{
+		return;
+	}
+	double min[2] = { min_x,min_y };
+	double max[2] = { max_x,max_y };
+
+	seg temp;
+	temp.origin = point(x, min[1]);
+	temp.dir = vector(0.0, 1.0);
+	temp.dist = max[1] - min[1];
+
+	double dist[20];
+
+	for (int i = 0; i < 20; i++)
+	{
+		double t_1, t_2;
+		cross(temp, segs[i], t_1, t_2);
+		dist[i] = t_1;
+	}
+	for (int i = 19; i > 0; i--)
+	{
+		bool swap = false;
+		for (int j = 0; j < i; j++)
+		{
+			if (dist[j] > dist[j + 1])
+			{
+				double temp_dist = dist[j];
+				dist[j] = dist[j + 1];
+				dist[j + 1] = temp_dist;
+				swap = true;
+			}
+		}
+		if (!swap)
+		{
+			break;
+		}
+	}
+
+	output[idx] = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		if ((dist[2 * i + 1] == DBL_MAX) || (dist[2 * i] == DBL_MAX))
+		{
+			break;
+		}
+		output[idx] += dist[2 * i + 1] - dist[2 * i];
+	}
+}
+
 __host__ __device__ double poly::area() const
 {
 	point max = segs[0].origin, min = segs[0].origin;
@@ -350,6 +411,43 @@ __host__ __device__ double poly::area() const
 		min[0] = (min[0] < segs[i].origin[0]) ? min[0] : segs[i].origin[0];
 		min[1] = (min[1] < segs[i].origin[1]) ? min[1] : segs[i].origin[1];
 	}
+
+
+#ifndef __CUDACC__
+	int device_n;
+	cudaGetDeviceCount(&device_n);
+
+	if (((max[0] - min[0]) > 100) && (device_n > 0))
+	{
+		seg* segs_d = NULL;
+		cudaMalloc((void**)&segs_d, sizeof(seg) * 20);
+		cudaMemcpy(segs_d, segs, sizeof(seg) * 20, cudaMemcpyHostToDevice);
+		double* output_d = NULL;
+		cudaMalloc((void**)&output_d, sizeof(double) * int(max[0] - min[0]));
+
+		cudaDeviceProp deviceProp;
+		cudaGetDeviceProperties(&deviceProp, 0);
+		int 每块线程 = deviceProp.maxThreadsPerBlock / 32;
+		int 块 = int(max[0] - min[0]) / 每块线程 + 1;
+
+		poly_area << < 块, 每块线程 >> > (segs_d, min[0], min[1], max[0], max[1], output_d);
+		cudaFree(segs_d);
+
+		double* output_h = new double[int(max[0] - min[0])];
+		cudaMemcpy(output_h, output_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		cudaFree(output_d);
+		double output = 0;
+		for (int i = 0; i<int(max[0] - min[0]); i++)
+		{
+			output += output_h[i];
+		}
+		delete[]output_h;
+		return output;
+	}
+
+#endif
+
+
 	double output = 0;
 	for (int x = min[0]; x < max[0]; x++)
 	{
@@ -599,6 +697,108 @@ __host__ __device__ bool is_overlap(const poly p_1, const poly p_2)
 	return false;
 }
 
+
+__global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double max_x, double max_y, double* output)
+{
+	int idx = threadIdx.x + blockIdx.x * blockDim.x;
+	int i = min_x + idx;
+	if (i >= max_x)
+	{
+		return;
+	}
+	double min[2] = { min_x,min_y };
+	double max[2] = { max_x,max_y };
+	poly p_1 = p[0], p_2 = p[1];
+
+	ray temp;
+	temp.origin = point(i, min[1]);
+	temp.dir = vector(0.0, 1.0);
+
+
+	bool in_1 = false, in_2 = false;
+	double dist[2][20];
+	for (int j = 0; j < 20; j++)
+	{
+		double t_1, t_2;
+		cross(temp, p_1.segs[j], t_1, t_2);
+		dist[0][j] = t_1;
+		if (t_1 != DBL_MAX)
+		{
+			in_1 = !in_1;
+		}
+		cross(temp, p_2.segs[j], t_1, t_2);
+		dist[1][j] = t_1;
+		if (t_1 != DBL_MAX)
+		{
+			in_2 = !in_2;
+		}
+	}
+	for (int j = 19; j > 0; j--)
+	{
+		bool swap = false;
+		for (int k = 0; k < j; k++)
+		{
+			if (dist[0][k] > dist[0][k + 1])
+			{
+				swap = true;
+				double t = dist[0][k];
+				dist[0][k + 1] = dist[0][k];
+				dist[0][k] = t;
+			}
+		}
+		if (!swap)
+		{
+			break;
+		}
+	}
+	for (int j = 19; j > 0; j--)
+	{
+		bool swap = false;
+		for (int k = 0; k < j; k++)
+		{
+			if (dist[1][k] > dist[1][k + 1])
+			{
+				swap = true;
+				double t = dist[1][k];
+				dist[1][k + 1] = dist[1][k];
+				dist[1][k] = t;
+			}
+		}
+		if (!swap)
+		{
+			break;
+		}
+	}
+
+	int j = 0, k = 0;
+	while ((j < 20) && (k < 20))
+	{
+		double next_1 = min[1] + dist[0][j] - temp.origin[1], next_2 = min[1] + dist[1][k] - temp.origin[1];
+
+		if (in_1 && in_2 && ((next_1 != DBL_MAX) || (next_2 != DBL_MAX)))
+		{
+			output[idx] += fmin(next_1, next_2);
+		}
+		if (next_1 < next_2)
+		{
+			j++;
+			in_1 = !in_1;
+		}
+		else if (next_1 > next_2)
+		{
+			k++;
+			in_2 = !in_2;
+		}
+		else
+		{
+			j++;
+			k++;
+			in_1 = !in_1;
+			in_2 = !in_2;
+		}
+	}
+}
+
 __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 {
 	point max_1 = p_1.segs[0].origin, min_1 = p_1.segs[0].origin;
@@ -619,6 +819,43 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 	}
 
 	point max(fmin(max_1[0], max_2[0]), fmin(max_1[1], max_2[1])), min(fmax(min_1[0], min_2[0]), fmax(min_1[1], min_2[1]));
+
+
+#ifndef __CUDACC__
+	int device_n;
+	cudaGetDeviceCount(&device_n);
+
+	if (((max[0] - min[0]) > 100) && (device_n > 0))
+	{
+		poly p_h[2] = { p_1,p_2 };
+		poly* p_d = NULL;
+		cudaMalloc((void**)&p_d, sizeof(poly) * 2);
+		cudaMemcpy(p_d, p_h, sizeof(poly) * 2, cudaMemcpyHostToDevice);
+
+		double* output_d = NULL;
+		cudaMalloc((void**)&output_d, sizeof(double) * int(max[0] - min[0]));
+
+		cudaDeviceProp deviceProp;
+		cudaGetDeviceProperties(&deviceProp, 0);
+		int 每块线程 = deviceProp.maxThreadsPerBlock / 32;
+		int 块 = int(max[0] - min[0]) / 每块线程 + 1;
+
+		overlap_area_cuda << < 块, 每块线程 >> > (p_d, min[0], min[1], max[0], max[1], output_d);
+		cudaFree(p_d);
+
+		double* output_h = new double[int(max[0] - min[0])];
+		cudaMemcpy(output_h, output_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		cudaFree(output_d);
+		double output = 0;
+		for (int i = 0; i<int(max[0] - min[0]); i++)
+		{
+			output += output_h[i];
+		}
+		delete[]output_h;
+		return output;
+	}
+
+#endif
 
 	double output = 0;
 	for (int i = min[0]; i < max[0]; i++)

@@ -45,11 +45,6 @@ public:
 	__host__ __device__ vector(point 点);
 	__host__ __device__ vector(double 方向[2], double 长度);
 	__host__ __device__ vector(double 角度, bool rad = false, double 长度 = 1);
-	//__host__ __device__ friend vector operator + (vector 向量_1, vector 向量_2);
-	//__host__ __device__ friend vector operator - (vector 向量_1, vector 向量_2);
-	//__host__ __device__ friend vector operator * (vector 向量, double 数);
-	//__host__ __device__ friend vector operator * (double 数, vector 向量);
-	//__host__ __device__ friend vector operator / (vector 向量, double 数);
 	__host__ __device__ vector& operator += (vector 向量);
 	__host__ __device__ vector& operator -= (vector 向量);
 	__host__ __device__ vector& operator *= (double 数);
@@ -158,8 +153,6 @@ public:
 	poly(std::vector<point>& 点);
 
 	__host__ __device__ bool legal();
-
-	__host__ __device__ double one_link_area();
 
 	__host__ __device__ void point_get(point*& 点) const;
 	void point_get(std::vector<point>& 点) const;

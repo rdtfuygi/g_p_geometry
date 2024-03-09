@@ -56,151 +56,151 @@ __host__ __device__ bool poly::legal()
 	return true;
 }
 
-__host__ __device__ double poly::one_link_area()
-{
-	point max = segs[0].origin, min = segs[0].origin;
-	for (int i = 1; i < 20; i++)
-	{
-		max[0] = (max[0] > segs[i].origin[0]) ? max[0] : segs[i].origin[0];
-		max[1] = (max[1] > segs[i].origin[1]) ? max[1] : segs[i].origin[1];
-		min[0] = (min[0] < segs[i].origin[0]) ? min[0] : segs[i].origin[0];
-		min[1] = (min[1] < segs[i].origin[1]) ? min[1] : segs[i].origin[1];
-	}
-
-
-	double last[20];
-	{
-		ray temp;
-		temp.origin = point(int(min[0] + 1), min[1]);
-		temp.dir = vector(0.0, 1.0);
-		for (int i = 0; i < 20; i++)
-		{
-			double t_1, t_2;
-			cross(temp, segs[i], t_1, t_2);
-			last[i] = t_1;
-		}
-		for (int i = 19; i > 0; i--)
-		{
-			bool swap = false;
-			for (int j = 0; j < i; j++)
-			{
-				if (last[j] < last[j + 1])
-				{
-					continue;
-				}
-				double temp_dist = last[j];
-				last[j] = last[j + 1];
-				last[j + 1] = temp_dist;
-				swap = true;
-			}
-			if (!swap)
-			{
-				break;
-			}
-		}
-	}
-
-
-	double areas[10];
-	char map[10] = { 0,1,2,3,4,5,6,7,8,9 };
-	for (int i = 0; i < 10; i++)
-	{
-		if ((last[2 * i + 1] != DBL_MAX) && (last[2 * i] != DBL_MAX))
-		{
-			areas[i] = last[2 * i + 1] - last[2 * i];
-		}
-		else
-		{
-			areas[i] = 0;
-		}
-	}
-
-	for (int x = min[0] + 2; x < max[0]; x++)
-	{
-		double dist[20];
-		char map_new[10] = { 10,10,10,10,10,10,10,10,10,10 };
-
-		seg temp;
-		temp.origin = point(x, min[1]);
-		temp.dir = vector(0.0, 1.0);
-		temp.dist = max[1] - min[1];
-		for (int i = 0; i < 20; i++)
-		{
-			double t_1, t_2;
-			cross(temp, segs[i], t_1, t_2);
-			dist[i] = t_1;
-		}
-		for (int i = 19; i > 0; i--)
-		{
-			bool swap = false;
-			for (int j = 0; j < i; j++)
-			{
-				if (dist[j] > dist[j + 1])
-				{
-					double temp_dist = dist[j];
-					dist[j] = dist[j + 1];
-					dist[j + 1] = temp_dist;
-					swap = true;
-				}
-			}
-			if (!swap)
-			{
-				break;
-			}
-		}
-
-		int i = 0, j = 0;
-		while ((i < 10) && (j < 10))
-		{
-			if ((last[2 * i] == DBL_MAX) || (last[2 * i + 1] == DBL_MAX) || (dist[2 * j] == DBL_MAX) || (dist[2 * j + 1] == DBL_MAX))
-			{
-				break;
-			}
-			if ((last[2 * i + 1] > dist[2 * j]) && (last[2 * i] < dist[2 * j + 1]))
-			{
-				if (map_new[j] == 10)
-				{
-					map_new[j] = map[i];
-					areas[map_new[j]] += dist[2 * j + 1] - dist[2 * j];
-				}
-				else if (map_new[j] != map[i])
-				{
-					areas[map_new[j]] += areas[map[i]];
-				}
-
-			}
-			if (last[2 * i + 1] < dist[2 * j + 1])
-			{
-				i++;
-			}
-			else if (last[2 * i + 1] > dist[2 * j + 1])
-			{
-				j++;
-			}
-			else
-			{
-				i++;
-				j++;
-			}
-		}
-		for (int i = 0; i < 10; i++)
-		{
-			last[2 * i] = dist[2 * i];
-			last[2 * i + 1] = dist[2 * i + 1];
-			if (map_new[i] != 10)
-			{
-				map[i] = map_new[i];
-			}
-		}
-	}
-	double output = 0;
-	for (int i = 0; i < 10; i++)
-	{
-		output = (areas[i] > output) ? areas[i] : output;
-	}
-
-	return output;
-}
+//__host__ __device__ double poly::one_link_area()
+//{
+//	point max = segs[0].origin, min = segs[0].origin;
+//	for (int i = 1; i < 20; i++)
+//	{
+//		max[0] = (max[0] > segs[i].origin[0]) ? max[0] : segs[i].origin[0];
+//		max[1] = (max[1] > segs[i].origin[1]) ? max[1] : segs[i].origin[1];
+//		min[0] = (min[0] < segs[i].origin[0]) ? min[0] : segs[i].origin[0];
+//		min[1] = (min[1] < segs[i].origin[1]) ? min[1] : segs[i].origin[1];
+//	}
+//
+//
+//	double last[20];
+//	{
+//		ray temp;
+//		temp.origin = point(int(min[0] + 1), min[1]);
+//		temp.dir = vector(0.0, 1.0);
+//		for (int i = 0; i < 20; i++)
+//		{
+//			double t_1, t_2;
+//			cross(temp, segs[i], t_1, t_2);
+//			last[i] = t_1;
+//		}
+//		for (int i = 19; i > 0; i--)
+//		{
+//			bool swap = false;
+//			for (int j = 0; j < i; j++)
+//			{
+//				if (last[j] < last[j + 1])
+//				{
+//					continue;
+//				}
+//				double temp_dist = last[j];
+//				last[j] = last[j + 1];
+//				last[j + 1] = temp_dist;
+//				swap = true;
+//			}
+//			if (!swap)
+//			{
+//				break;
+//			}
+//		}
+//	}
+//
+//
+//	double areas[10];
+//	char map[10] = { 0,1,2,3,4,5,6,7,8,9 };
+//	for (int i = 0; i < 10; i++)
+//	{
+//		if ((last[2 * i + 1] != DBL_MAX) && (last[2 * i] != DBL_MAX))
+//		{
+//			areas[i] = last[2 * i + 1] - last[2 * i];
+//		}
+//		else
+//		{
+//			areas[i] = 0;
+//		}
+//	}
+//
+//	for (int x = min[0] + 2; x < max[0]; x++)
+//	{
+//		double dist[20];
+//		char map_new[10] = { 10,10,10,10,10,10,10,10,10,10 };
+//
+//		seg temp;
+//		temp.origin = point(x, min[1]);
+//		temp.dir = vector(0.0, 1.0);
+//		temp.dist = max[1] - min[1];
+//		for (int i = 0; i < 20; i++)
+//		{
+//			double t_1, t_2;
+//			cross(temp, segs[i], t_1, t_2);
+//			dist[i] = t_1;
+//		}
+//		for (int i = 19; i > 0; i--)
+//		{
+//			bool swap = false;
+//			for (int j = 0; j < i; j++)
+//			{
+//				if (dist[j] > dist[j + 1])
+//				{
+//					double temp_dist = dist[j];
+//					dist[j] = dist[j + 1];
+//					dist[j + 1] = temp_dist;
+//					swap = true;
+//				}
+//			}
+//			if (!swap)
+//			{
+//				break;
+//			}
+//		}
+//
+//		int i = 0, j = 0;
+//		while ((i < 10) && (j < 10))
+//		{
+//			if ((last[2 * i] == DBL_MAX) || (last[2 * i + 1] == DBL_MAX) || (dist[2 * j] == DBL_MAX) || (dist[2 * j + 1] == DBL_MAX))
+//			{
+//				break;
+//			}
+//			if ((last[2 * i + 1] > dist[2 * j]) && (last[2 * i] < dist[2 * j + 1]))
+//			{
+//				if (map_new[j] == 10)
+//				{
+//					map_new[j] = map[i];
+//					areas[map_new[j]] += dist[2 * j + 1] - dist[2 * j];
+//				}
+//				else if (map_new[j] != map[i])
+//				{
+//					areas[map_new[j]] += areas[map[i]];
+//				}
+//
+//			}
+//			if (last[2 * i + 1] < dist[2 * j + 1])
+//			{
+//				i++;
+//			}
+//			else if (last[2 * i + 1] > dist[2 * j + 1])
+//			{
+//				j++;
+//			}
+//			else
+//			{
+//				i++;
+//				j++;
+//			}
+//		}
+//		for (int i = 0; i < 10; i++)
+//		{
+//			last[2 * i] = dist[2 * i];
+//			last[2 * i + 1] = dist[2 * i + 1];
+//			if (map_new[i] != 10)
+//			{
+//				map[i] = map_new[i];
+//			}
+//		}
+//	}
+//	double output = 0;
+//	for (int i = 0; i < 10; i++)
+//	{
+//		output = (areas[i] > output) ? areas[i] : output;
+//	}
+//
+//	return output;
+//}
 
 __host__ __device__ void poly::point_get(point*& µã) const
 {

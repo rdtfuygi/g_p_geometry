@@ -28,7 +28,7 @@ __host__ __device__ double seg::point_dist(const point µã) const
 	temp.dir[1] = -dir[0];
 
 	double t_1, t_2;
-	cross(*this, temp, t_1, t_2);
+	cross(line(*this), temp, t_1, t_2);
 	if (t_1 < 0)
 	{
 		return length(µã, origin);
@@ -161,6 +161,17 @@ __host__ __device__ bool is_cross(const seg l_1, const seg l_2)
 }
 
 __host__ __device__ bool is_cross(const seg l_1, const ray l_2)
+{
+	double t_1, t_2;
+	cross(l_1, l_2, t_1, t_2);
+	if (t_1 != DBL_MAX)
+	{
+		return true;
+	}
+	return false;
+}
+
+__host__ __device__ bool is_cross(const seg l_1, const line l_2)
 {
 	double t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);

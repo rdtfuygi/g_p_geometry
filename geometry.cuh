@@ -138,7 +138,13 @@ DLL __host__ __device__ point cross(const ray l_1, const seg l_2);
 DLL __host__ __device__ point cross(const seg l_1, const line l_2);
 DLL __host__ __device__ point cross(const seg l_1, const ray l_2);
 DLL __host__ __device__ point cross(const seg l_1, const seg l_2);
+DLL __host__ __device__ bool is_cross(const line l_1, const line l_2);
+DLL __host__ __device__ bool is_cross(const line l_1, const ray l_2);
+DLL __host__ __device__ bool is_cross(const line l_1, const seg l_2);
+DLL __host__ __device__ bool is_cross(const ray l_1, const line l_2);
+DLL __host__ __device__ bool is_cross(const ray l_1, const ray l_2);
 DLL __host__ __device__ bool is_cross(const ray l_1, const seg l_2);
+DLL __host__ __device__ bool is_cross(const seg l_1, const line l_2);
 DLL __host__ __device__ bool is_cross(const seg l_1, const ray l_2);
 DLL __host__ __device__ bool is_cross(const seg l_1, const seg l_2);
 
@@ -180,6 +186,8 @@ public:
 
 	void print(cv::InputOutputArray Í¼Ïñ, double ±ÈÀý, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸ = 1) const;
 
+	__host__ __device__ point center() const;
+
 	__host__ __device__ vector move2center();
 
 	__host__ __device__ void simple(double ½Ç¶È = 30, bool rad = false);
@@ -191,4 +199,8 @@ DLL __host__ __device__ double overlap_area(const poly p_1, const poly p_2);
 
 DLL __host__ __device__ double dist(const poly p_1, const poly p_2);
 
+DLL __host__ __device__ double dist(const poly p, const line l);
 
+DLL __host__ __device__ double dist(const poly p, const ray l);
+
+DLL __host__ __device__ double dist(const poly p, const seg l);

@@ -506,27 +506,31 @@ void poly::print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色,
 	//segs[0].origin.print(图像, 比例, 颜色, 粗细 * 4);
 }
 
-vector poly::move2center()
+__host__ __device__ point poly::center() const
 {
-	reset_seg();
-
-
-	double s = (dir_area() > 0) ? area() : -area();
+	double s = 0;
 	double x = 0, y = 0;
 	for (int i = 0; i < 19; i++)
 	{
 		double 积 = segs[i].dir ^ segs[i + 1].dir;
-		x += (segs[i].origin[0] + segs[i+1].origin[0]) * 积;
-		y += (segs[i].origin[1] + segs[i+1].origin[1]) * 积;
+		x += (segs[i].origin[0] + segs[i + 1].origin[0]) * 积;
+		y += (segs[i].origin[1] + segs[i + 1].origin[1]) * 积;
+		s += 积;
 	}
-	vector move(x / 6 / s, y / 6 / s);
+	s *= 3;
+	return point(x / s, y / s);
+}
+
+vector poly::move2center()
+{
+	vector move(center());
 
 	for (int i = 0; i < 20; i++)
 	{
-		segs[i].origin = point(vector(segs[i].origin) + move);
+		segs[i].origin = point(vector(segs[i].origin) - move);
 	}
 
-	return move;
+	return vector(0.0, 0.0) - move;
 }
 
 __host__ __device__ void poly::simple(double 角度, bool rad)
@@ -954,14 +958,59 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 
 __host__ __device__ double dist(const poly p_1, const poly p_2)
 {
-	double dist = DBL_MAX;
+	return length(p_1.center(), p_2.center());
+}
+
+__host__ __device__ double dist(const poly p, const line l)
+{
+	double d = DBL_MAX;
 	for (int i = 0; i < 20; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		if (is_cross(p[i], l))
 		{
-			dist = fmin(dist, p_1[i].point_dist(p_2[j].origin));
-			dist = fmin(dist, p_2[i].point_dist(p_1[j].origin));
+			return 0;
+		}
+		double t = l.point_dist(p[i].origin);
+		if (t < d)
+		{
+			d = t;
 		}
 	}
-	return dist;
+	return d;
+}
+
+__host__ __device__ double dist(const poly p, const ray l)
+{
+	double d = DBL_MAX;
+	for (int i = 0; i < 20; i++)
+	{
+		if (is_cross(p[i], l))
+		{
+			return 0;
+		}
+		double t = l.point_dist(p[i].origin);
+		if (t < d)
+		{
+			d = t;
+		}
+	}
+	return d;
+}
+
+__host__ __device__ double dist(const poly p, const seg l)
+{
+	double d = DBL_MAX;
+	for (int i = 0; i < 20; i++)
+	{
+		if (is_cross(p[i], l))
+		{
+			return 0;
+		}
+		double t = l.point_dist(p[i].origin);
+		if (t < d)
+		{
+			d = t;
+		}
+	}
+	return d;
 }

@@ -192,3 +192,36 @@ __host__ __device__ point cross(const line l_1, const seg l_2)
 		return point(DBL_MAX, DBL_MAX);
 	}
 }
+
+__host__ __device__ bool is_cross(const line l_1, const line l_2)
+{	
+	double t_1, t_2;
+	cross(l_1, l_2, t_1, t_2);
+	if (t_1 == DBL_MAX)
+	{
+		return false;
+	}
+	return true;
+}
+
+__host__ __device__ bool is_cross(const line l_1, const ray l_2)
+{
+	double t_1, t_2;
+	cross(l_1, l_2, t_1, t_2);
+	if (t_1 == DBL_MAX)
+	{
+		return false;
+	}
+	return true;
+}
+
+__host__ __device__ bool is_cross(const line l_1, const seg l_2)
+{
+	double t_1, t_2;
+	cross(l_1, l_2, t_1, t_2);
+	if (t_1 == DBL_MAX)
+	{
+		return false;
+	}
+	return true;
+}

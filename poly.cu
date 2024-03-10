@@ -517,7 +517,7 @@ __host__ __device__ point poly::center() const
 		y += (segs[i].origin[1] + segs[i + 1].origin[1]) * »ý;
 		s += »ý;
 	}
-	s *= 3;
+	s *= 6;
 	return point(x / s, y / s);
 }
 

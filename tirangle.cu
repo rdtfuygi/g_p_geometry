@@ -58,7 +58,7 @@ __host__ __device__ bool tirangle::is_cross(const seg l) const
 
 __host__ __device__ double tirangle::area() const
 {
-	return abs((vector(segs[1].origin) - vector(segs[0].origin)) ^ (vector(segs[2].origin) - vector(segs[0].origin)));
+	return abs((vector(segs[1].origin) - vector(segs[0].origin)) ^ (vector(segs[2].origin) - vector(segs[0].origin))) / 2;
 }
 
 void tirangle::print(cv::InputOutputArray Í¼Ïñ, double ±ÈÀý, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const

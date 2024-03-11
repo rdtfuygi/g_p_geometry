@@ -44,5 +44,8 @@
     <CudaCompile Include="geometry.cu">
       <Filter>源文件</Filter>
     </CudaCompile>
+    <CudaCompile Include="tirangle.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

@@ -1,10 +1,35 @@
 #include "geometry.cuh"
 
-#ifdef __CUDACC__
-int a = 0;
-#else
-int a = 1;
-#endif // __CUDACC__
+
+
+__host__ __device__ void sort(double* list, int n, bool up = true)
+{
+	for (int i = n - 1; i > 0; i--)
+	{
+		bool swap = false;
+		for (int j = 0; j < i; j++)
+		{
+			if ((list[j] > list[j + 1]) && up)
+			{
+				double temp_dist = list[j];
+				list[j] = list[j + 1];
+				list[j + 1] = temp_dist;
+				swap = true;
+			}
+			else if ((list[j] < list[j + 1]) && !up)
+			{
+				double temp_dist = list[j];
+				list[j] = list[j + 1];
+				list[j + 1] = temp_dist;
+				swap = true;
+			}
+		}
+		if (!swap)
+		{
+			break;
+		}
+	}
+}
 
 
 
@@ -36,6 +61,14 @@ poly::poly(std::vector<point>& 点)
 		segs[i] = seg(点[点.size() - 1], 点[点.size() - 1]);
 	}
 	segs[20 - 1] = seg(点[temp - 1], 点[0]);
+}
+
+poly::poly(const tirangle 三角)
+{
+	segs[0] = 三角.segs[0];
+	segs[1] = 三角.segs[1];
+	segs[2] = 三角.segs[2];
+	reset_seg();
 }
 
 __host__ __device__ bool poly::legal()
@@ -371,24 +404,25 @@ __global__ void poly_area(seg* segs, double min_x, double min_y, double max_x, d
 		cross(temp, segs[i], t_1, t_2);
 		dist[i] = t_1;
 	}
-	for (int i = 19; i > 0; i--)
-	{
-		bool swap = false;
-		for (int j = 0; j < i; j++)
-		{
-			if (dist[j] > dist[j + 1])
-			{
-				double temp_dist = dist[j];
-				dist[j] = dist[j + 1];
-				dist[j + 1] = temp_dist;
-				swap = true;
-			}
-		}
-		if (!swap)
-		{
-			break;
-		}
-	}
+	sort(dist, 20);
+	//for (int i = 19; i > 0; i--)
+	//{
+	//	bool swap = false;
+	//	for (int j = 0; j < i; j++)
+	//	{
+	//		if (dist[j] > dist[j + 1])
+	//		{
+	//			double temp_dist = dist[j];
+	//			dist[j] = dist[j + 1];
+	//			dist[j + 1] = temp_dist;
+	//			swap = true;
+	//		}
+	//	}
+	//	if (!swap)
+	//	{
+	//		break;
+	//	}
+	//}
 
 	output[idx] = 0;
 	for (int i = 0; i < 10; i++)
@@ -464,24 +498,25 @@ __host__ __device__ double poly::area() const
 			cross(temp, segs[i], t_1, t_2);
 			dist[i] = t_1;
 		}
-		for (int i = 19; i > 0; i--)
-		{
-			bool swap = false;
-			for (int j = 0; j < i; j++)
-			{
-				if (dist[j] > dist[j + 1])
-				{
-					double temp_dist = dist[j];
-					dist[j] = dist[j + 1];
-					dist[j + 1] = temp_dist;
-					swap = true;
-				}
-			}
-			if (!swap)
-			{
-				break;
-			}
-		}
+		sort(dist, 20);
+		//for (int i = 19; i > 0; i--)
+		//{
+		//	bool swap = false;
+		//	for (int j = 0; j < i; j++)
+		//	{
+		//		if (dist[j] > dist[j + 1])
+		//		{
+		//			double temp_dist = dist[j];
+		//			dist[j] = dist[j + 1];
+		//			dist[j + 1] = temp_dist;
+		//			swap = true;
+		//		}
+		//	}
+		//	if (!swap)
+		//	{
+		//		break;
+		//	}
+		//}
 
 		for (int i = 0; i < 10; i++)
 		{
@@ -506,19 +541,186 @@ void poly::print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色,
 	//segs[0].origin.print(图像, 比例, 颜色, 粗细 * 4);
 }
 
+__global__ void poly_center(seg* segs, double min_x, double min_y, double max_x, double max_y, double* p_area, double* x_, double* y_)
+{
+	int idx = threadIdx.x + blockIdx.x * blockDim.x;
+	int x = min_x + idx;
+	if (x >= max_x)
+	{
+		return;
+	}
+	double min[2] = { min_x,min_y };
+	double max[2] = { max_x,max_y };
+
+	seg temp;
+	temp.origin = point(x, min[1]);
+	temp.dir = vector(0.0, 1.0);
+	temp.dist = max[1] - min[1];
+
+	double dist[20];
+
+	for (int i = 0; i < 20; i++)
+	{
+		double t_1, t_2;
+		cross(temp, segs[i], t_1, t_2);
+		dist[i] = t_1;
+	}
+	sort(dist, 20);
+	//for (int i = 19; i > 0; i--)
+	//{
+	//	bool swap = false;
+	//	for (int j = 0; j < i; j++)
+	//	{
+	//		if (dist[j] > dist[j + 1])
+	//		{
+	//			double temp_dist = dist[j];
+	//			dist[j] = dist[j + 1];
+	//			dist[j + 1] = temp_dist;
+	//			swap = true;
+	//		}
+	//	}
+	//	if (!swap)
+	//	{
+	//		break;
+	//	}
+	//}
+
+	p_area[idx] = 0, x_[idx] = 0, y_[idx] = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		if ((dist[2 * i + 1] == DBL_MAX) || (dist[2 * i] == DBL_MAX))
+		{
+			break;
+		}
+		p_area[idx] += dist[2 * i + 1] - dist[2 * i];
+		y_[idx] += pow(dist[2 * i + 1] + min[1], 2) - pow(dist[2 * i] + min[1], 2);
+	}
+	x_[idx] = p_area[idx] * x;
+}
+
 __host__ __device__ point poly::center() const
 {
-	double s = 0;
-	double x = 0, y = 0;
-	for (int i = 0; i < 19; i++)
+	//double s = 0;
+	//double x = 0, y = 0;
+	//for (int i = 0; i < 19; i++)
+	//{
+	//	double 积 = segs[i].dir ^ segs[i + 1].dir;
+	//	x += (segs[i].origin[0] + segs[i + 1].origin[0]) * 积;
+	//	y += (segs[i].origin[1] + segs[i + 1].origin[1]) * 积;
+	//	s += 积;
+	//}
+	//s *= 6;
+	//return point(x / s, y / s);
+
+	point max = segs[0].origin, min = segs[0].origin;
+	for (int i = 1; i < 20; i++)
 	{
-		double 积 = segs[i].dir ^ segs[i + 1].dir;
-		x += (segs[i].origin[0] + segs[i + 1].origin[0]) * 积;
-		y += (segs[i].origin[1] + segs[i + 1].origin[1]) * 积;
-		s += 积;
+		max[0] = (max[0] > segs[i].origin[0]) ? max[0] : segs[i].origin[0];
+		max[1] = (max[1] > segs[i].origin[1]) ? max[1] : segs[i].origin[1];
+		min[0] = (min[0] < segs[i].origin[0]) ? min[0] : segs[i].origin[0];
+		min[1] = (min[1] < segs[i].origin[1]) ? min[1] : segs[i].origin[1];
 	}
-	s *= 6;
-	return point(x / s, y / s);
+
+
+#ifndef __CUDACC__
+	int device_n;
+	cudaGetDeviceCount(&device_n);
+
+	if (((max[0] - min[0]) > 100) && (device_n > 0))
+	{
+		seg* segs_d = NULL;//
+		cudaMalloc((void**)&segs_d, sizeof(seg) * 20);
+		cudaMemcpy(segs_d, segs, sizeof(seg) * 20, cudaMemcpyHostToDevice);
+		double* p_area_d = NULL;//
+		cudaMalloc((void**)&p_area_d, sizeof(double) * int(max[0] - min[0]));
+		double* x_d = NULL;//
+		cudaMalloc((void**)&x_d, sizeof(double) * int(max[0] - min[0]));
+		double* y_d = NULL;//
+		cudaMalloc((void**)&y_d, sizeof(double) * int(max[0] - min[0]));
+
+		cudaDeviceProp deviceProp;
+		cudaGetDeviceProperties(&deviceProp, 0);
+		int 每块线程 = deviceProp.maxThreadsPerBlock / 32;
+		int 块 = int(max[0] - min[0]) / 每块线程 + 1;
+
+		poly_center << < 块, 每块线程 >> > (segs_d, min[0], min[1], max[0], max[1], p_area_d, x_d, y_d);
+		cudaFree(segs_d);
+
+		double* p_area_h = new double[int(max[0] - min[0])];
+		cudaMemcpy(p_area_h, p_area_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		double* x_h = new double[int(max[0] - min[0])];
+		cudaMemcpy(x_h, x_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		double* y_h = new double[int(max[0] - min[0])];
+		cudaMemcpy(y_h, y_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		cudaFree(p_area_d);
+		cudaFree(x_d);
+		cudaFree(y_d);
+		double p_area = 0, x = 0, y = 0;
+		for (int i = 0; i<int(max[0] - min[0]); i++)
+		{
+			p_area += p_area_h[i];
+			x += x_h[i];
+			y += y_h[i];
+		}
+		delete[]p_area_h;
+		delete[]x_h;
+		delete[]y_h;
+		return point(x / p_area, y / 2 / p_area);
+	}
+
+#endif
+
+
+	double p_area = 0, x_ = 0, y_ = 0;
+	for (int x = min[0]; x < max[0]; x++)
+	{
+		seg temp;
+		temp.origin = point(x, min[1]);
+		temp.dir = vector(0.0, 1.0);
+		temp.dist = max[1] - min[1];
+
+		double dist[20];
+
+		for (int i = 0; i < 20; i++)
+		{
+			double t_1, t_2;
+			cross(temp, segs[i], t_1, t_2);
+			dist[i] = t_1;
+		}
+		sort(dist, 20);
+		//for (int i = 19; i > 0; i--)
+		//{
+		//	bool swap = false;
+		//	for (int j = 0; j < i; j++)
+		//	{
+		//		if (dist[j] > dist[j + 1])
+		//		{
+		//			double temp_dist = dist[j];
+		//			dist[j] = dist[j + 1];
+		//			dist[j + 1] = temp_dist;
+		//			swap = true;
+		//		}
+		//	}
+		//	if (!swap)
+		//	{
+		//		break;
+		//	}
+		//}
+
+		double d_x = 0;
+		for (int i = 0; i < 10; i++)
+		{
+			if ((dist[2 * i + 1] == DBL_MAX) || (dist[2 * i] == DBL_MAX))
+			{
+				break;
+			}
+			p_area += dist[2 * i + 1] - dist[2 * i];
+			d_x += dist[2 * i + 1] - dist[2 * i];
+			y_ += pow(dist[2 * i + 1] + min[1], 2) - pow(dist[2 * i] + min[1], 2);
+		}
+		x_ += d_x * x;
+	}
+	return point(x_ / p_area, y_ / 2 / p_area);
 }
 
 vector poly::move2center()
@@ -737,51 +939,57 @@ __global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double ma
 			in_2 = !in_2;
 		}
 	}
-	for (int j = 19; j > 0; j--)
-	{
-		bool swap = false;
-		for (int k = 0; k < j; k++)
-		{
-			if (dist[0][k] > dist[0][k + 1])
-			{
-				swap = true;
-				double t = dist[0][k];
-				dist[0][k + 1] = dist[0][k];
-				dist[0][k] = t;
-			}
-		}
-		if (!swap)
-		{
-			break;
-		}
-	}
-	for (int j = 19; j > 0; j--)
-	{
-		bool swap = false;
-		for (int k = 0; k < j; k++)
-		{
-			if (dist[1][k] > dist[1][k + 1])
-			{
-				swap = true;
-				double t = dist[1][k];
-				dist[1][k + 1] = dist[1][k];
-				dist[1][k] = t;
-			}
-		}
-		if (!swap)
-		{
-			break;
-		}
-	}
+	sort(dist[0], 20);
+	//for (int j = 19; j > 0; j--)
+	//{
+	//	bool swap = false;
+	//	for (int k = 0; k < j; k++)
+	//	{
+	//		if (dist[0][k] > dist[0][k + 1])
+	//		{
+	//			swap = true;
+	//			double t = dist[0][k];
+	//			dist[0][k + 1] = dist[0][k];
+	//			dist[0][k] = t;
+	//		}
+	//	}
+	//	if (!swap)
+	//	{
+	//		break;
+	//	}
+	//}
+	sort(dist[1], 20);
+	//for (int j = 19; j > 0; j--)
+	//{
+	//	bool swap = false;
+	//	for (int k = 0; k < j; k++)
+	//	{
+	//		if (dist[1][k] > dist[1][k + 1])
+	//		{
+	//			swap = true;
+	//			double t = dist[1][k];
+	//			dist[1][k + 1] = dist[1][k];
+	//			dist[1][k] = t;
+	//		}
+	//	}
+	//	if (!swap)
+	//	{
+	//		break;
+	//	}
+	//}
 
 	int j = 0, k = 0;
 	while ((j < 20) && (k < 20))
 	{
 		double next_1 = min[1] + dist[0][j] - temp.origin[1], next_2 = min[1] + dist[1][k] - temp.origin[1];
 
-		if (in_1 && in_2 && ((next_1 != DBL_MAX) || (next_2 != DBL_MAX)))
+		if (in_1 && in_2 && ((next_1 < (max[1] - min[1])) || (next_2 < (max[1] - min[1]))))
 		{
 			output[idx] += fmin(next_1, next_2);
+		}
+		else if ((next_1 > (max[1] - min[1])) || (next_2 > (max[1] - min[1])))
+		{
+			break;
 		}
 		if (next_1 < next_2)
 		{
@@ -793,13 +1001,14 @@ __global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double ma
 			k++;
 			in_2 = !in_2;
 		}
-		else
+		else if(next_1 == next_2)
 		{
 			j++;
 			k++;
 			in_1 = !in_1;
 			in_2 = !in_2;
 		}
+
 	}
 }
 
@@ -887,51 +1096,57 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 				in_2 = !in_2;
 			}
 		}
-		for (int j = 19; j > 0; j--)
-		{
-			bool swap = false;
-			for (int k = 0; k < j; k++)
-			{
-				if (dist[0][k] > dist[0][k + 1])
-				{
-					swap = true;
-					double t = dist[0][k];
-					dist[0][k + 1] = dist[0][k];
-					dist[0][k] = t;
-				}
-			}
-			if (!swap)
-			{
-				break;
-			}
-		}
-		for (int j = 19; j > 0; j--)
-		{
-			bool swap = false;
-			for (int k = 0; k < j; k++)
-			{
-				if (dist[1][k] > dist[1][k + 1])
-				{
-					swap = true;
-					double t = dist[1][k];
-					dist[1][k + 1] = dist[1][k];
-					dist[1][k] = t;
-				}
-			}
-			if (!swap)
-			{
-				break;
-			}
-		}
+		sort(dist[0], 20);
+		//for (int j = 19; j > 0; j--)
+		//{
+		//	bool swap = false;
+		//	for (int k = 0; k < j; k++)
+		//	{
+		//		if (dist[0][k] > dist[0][k + 1])
+		//		{
+		//			swap = true;
+		//			double t = dist[0][k];
+		//			dist[0][k + 1] = dist[0][k];
+		//			dist[0][k] = t;
+		//		}
+		//	}
+		//	if (!swap)
+		//	{
+		//		break;
+		//	}
+		//}
+		sort(dist[1], 20);
+		//for (int j = 19; j > 0; j--)
+		//{
+		//	bool swap = false;
+		//	for (int k = 0; k < j; k++)
+		//	{
+		//		if (dist[1][k] > dist[1][k + 1])
+		//		{
+		//			swap = true;
+		//			double t = dist[1][k];
+		//			dist[1][k + 1] = dist[1][k];
+		//			dist[1][k] = t;
+		//		}
+		//	}
+		//	if (!swap)
+		//	{
+		//		break;
+		//	}
+		//}
 
 		int j = 0, k = 0;
 		while ((j < 20) && (k < 20))
 		{
 			double next_1 = min[1] + dist[0][j] - temp.origin[1], next_2 = min[1] + dist[1][k] - temp.origin[1];
 
-			if (in_1 && in_2 && ((next_1 != DBL_MAX) || (next_2 != DBL_MAX)))
+			if (in_1 && in_2 && ((next_1 < (max[1] - min[1])) || (next_2 < (max[1] - min[1]))))
 			{
 				output += fmin(next_1, next_2);
+			}
+			else if ((next_1 > (max[1] - min[1])) || (next_2 > (max[1] - min[1])))
+			{
+				break;
 			}
 			if (next_1 < next_2)
 			{
@@ -943,14 +1158,13 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 				k++;
 				in_2 = !in_2;
 			}
-			else
+			else if (next_1 == next_2)
 			{
 				j++;
 				k++;
 				in_1 = !in_1;
 				in_2 = !in_2;
 			}
-
 		}
 	}
 	return output;

@@ -149,14 +149,38 @@ DLL __host__ __device__ bool is_cross(const seg l_1, const ray l_2);
 DLL __host__ __device__ bool is_cross(const seg l_1, const seg l_2);
 
 
+class DLL tirangle
+{
+public:
+	seg segs[3];
 
-class DLL  poly
+	__host__ __device__ tirangle();
+	__host__ __device__ tirangle(const point* 点);
+	tirangle(std::vector<point>& 点);
+
+	__host__ __device__ seg& operator[](int i);
+	__host__ __device__ seg operator[](int i) const;
+
+	__host__ __device__ void reset_seg();
+	__host__ __device__ void reset_seg(int i);
+
+	__host__ __device__ bool is_cross(const seg l) const;
+
+	__host__ __device__ double area() const;
+
+	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+};
+
+
+class DLL poly
 {
 public:
 	seg segs[20];
+
 	__host__ __device__ poly();
 	__host__ __device__ poly(const point* 点, int m = 20);
 	poly(std::vector<point>& 点);
+	__host__ __device__ poly(const tirangle 三角);
 
 	__host__ __device__ bool legal();
 
@@ -204,3 +228,5 @@ DLL __host__ __device__ double dist(const poly p, const line l);
 DLL __host__ __device__ double dist(const poly p, const ray l);
 
 DLL __host__ __device__ double dist(const poly p, const seg l);
+
+

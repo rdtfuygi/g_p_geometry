@@ -74,9 +74,9 @@ poly::poly(const tirangle Èý½Ç)
 __host__ __device__ bool poly::legal()
 {
 	reset_seg();
-	for (int i = 0; i < 20; i++)
+	for (int i = 1; i < 20; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = 0; j < i - 1; j++)
 		{
 			double t_1, t_2;
 			cross(segs[i], segs[j], t_1, t_2);
@@ -360,12 +360,20 @@ __host__ __device__ void poly::reset_seg(int i)
 
 __host__ __device__ seg& poly::operator[](int i)
 {
-	return segs[i % 20 ];
+	while (i < 0)
+	{
+		i += 20;
+	}
+	return segs[i % 20];
 }
 
 __host__ __device__ seg poly::operator[](int i) const
 {
-	return segs[i % 20 ];
+	while (i < 0)
+	{
+		i += 20;
+	}
+	return segs[i % 20];
 }
 
 __host__ __device__ double poly::dir_area() const

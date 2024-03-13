@@ -281,11 +281,6 @@ void poly::seg_get(std::vector<seg>& 线段) const
 
 __host__ __device__ bool poly::point_in(point 点) const
 {
-	ray temp;
-	temp.origin = 点;
-	temp.dir = vector(point({ 0,1 }));
-	int k = 0;
-
 	point max = segs[0].origin, min = segs[0].origin;
 	for (int i = 1; i < 20 ; i++)
 	{
@@ -298,6 +293,11 @@ __host__ __device__ bool poly::point_in(point 点) const
 	{
 		return false;
 	}
+
+	ray temp;
+	temp.origin = 点;
+	temp.dir = vector(0.0, 1.0);
+	int k = 0;
 
 	for (int i = 0; i < 20 ; i++)
 	{
@@ -835,79 +835,24 @@ __host__ __device__ double poly::overlap_area(const poly other) const
 
 __host__ __device__ bool is_overlap(const poly p_1, const poly p_2)
 {
-	int l[20];
 	for (int i = 0; i < 20; i++)
 	{
-		l[i] = 0;
-	}
-
-	for (int i = 0; i < 20 ; i++)
-	{
-		int k = 0;
 		for (int j = 0; j < 20; j++)
 		{
-			double t_1, t_2;
-			cross(ray(p_1[i]), ray(p_2[j]), t_1, t_2);
-			if ((t_1 < p_1[i].dist) && (t_2 < p_2[j].dist))
+			if (is_cross(p_1[i], p_2[j]))
 			{
 				return true;
 			}
-
-			if ((t_1 != DBL_MAX) || ((t_2 > p_2[j].dist) && (t_2 != DBL_MAX)))
-			{
-				l[j]++;
-				k++;
-			}
 		}
-
-		if ((k % 2) == 0)
+		if (p_1.point_in(p_2[i].origin))
 		{
-			continue;
+			return true;
 		}
-		
-		k = 0;
-		for (int j = 0; j < 20; j++)
-		{
-			double t_1, t_2;
-			cross(ray(p_1[i].origin, -1 * p_1[i].dir), p_2[j], t_1, t_2);
-		
-			if (t_1 != DBL_MAX)
-			{
-				k++;
-			}
-		}
-
-		if ((k % 2) == 1)
+		if (p_2.point_in(p_1[i].origin))
 		{
 			return true;
 		}
 	}
-
-	for (int i = 0; i < 20; i++)
-	{
-		if ((l[i] % 2) == 0)
-		{
-			continue;
-		}
-		
-		l[i] = 0;
-		for (int j = 0; j < 20 ; j++)
-		{
-			double t_1, t_2;
-			cross(p_1[j], ray(p_2[i].origin, -1 * p_2[i].dir), t_1, t_2);
-		
-			if (t_1 != DBL_MAX)
-			{
-				l[i]++;
-			}
-		}
-
-		if ((l[i] % 2) == 1)
-		{
-			return true;
-		}
-	}
-
 	return false;
 }
 

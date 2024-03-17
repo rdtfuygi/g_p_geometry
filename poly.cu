@@ -735,11 +735,16 @@ __host__ __device__ point poly::fast_center() const
 {
 	double s = 0;
 	point center_(0.0, 0.0);
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 19; i++)
 	{
-		double a = vector(segs[i].origin) ^ vector(segs[(i + 1) % 20].origin);
+		double a = vector(segs[i].origin) ^ vector(segs[i + 1].origin);
 		s += a;
-		center_ = point(vector(center_) + a * (vector(segs[i].origin) + vector(segs[(i + 1) % 20].origin)));
+		center_ = point(vector(center_) + a * (vector(segs[i].origin) + vector(segs[i + 1].origin)));
+	}
+	{
+		double a = vector(segs[19].origin) ^ vector(segs[0].origin);
+		s += a;
+		center_ = point(vector(center_) + a * (vector(segs[19].origin) + vector(segs[0].origin)));
 	}
 	center_ = point(vector(center_) / s / 3);
 	return center_;
@@ -747,7 +752,7 @@ __host__ __device__ point poly::fast_center() const
 
 vector poly::move2center()
 {
-	vector move(center());
+	vector move(fast_center());
 
 	for (int i = 0; i < 20; i++)
 	{
@@ -1067,7 +1072,7 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 
 __host__ __device__ double dist(const poly p_1, const poly p_2)
 {
-	return length(p_1.center(), p_2.center());
+	return length(p_1.fast_center(), p_2.fast_center());
 }
 
 __host__ __device__ double dist(const poly p, const line l)

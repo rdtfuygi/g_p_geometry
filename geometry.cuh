@@ -58,6 +58,11 @@ public:
 	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 };
 
+DLL __host__ __device__ double inc_angle_cos(vector 向量_1, vector 向量_2);
+DLL __host__ __device__ double inc_angle_sin(vector 向量_1, vector 向量_2);
+
+DLL __host__ __device__ vector operator - (vector 向量);
+
 DLL __host__ __device__ vector operator + (vector 向量_1, vector 向量_2);
 DLL __host__ __device__ vector operator - (vector 向量_1, vector 向量_2);
 DLL __host__ __device__ vector operator * (vector 向量, double 数);
@@ -86,6 +91,7 @@ public:
 	__host__ __device__ double angle_get(bool rad = false) const;
 	__host__ __device__ line rotate(const point 点, double 角度, bool rad = false) const;
 	__host__ __device__ double point_dist(const point 点) const;
+	__host__ __device__ void norm();
 
 	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 };
@@ -116,10 +122,13 @@ public:
 	__host__ __device__ point end() const;
 	__host__ __device__ seg rotate(const point 点, double 角度, bool rad = false) const;
 	__host__ __device__ double point_dist(const point 点) const;
+	__host__ __device__ void norm();
 
 	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 };
 
+DLL __host__ __device__ double inc_angle_cos(const line l_1, const line l_2);
+DLL __host__ __device__ double inc_angle_sin(const line l_1, const line l_2);
 DLL __host__ __device__ void cross(const line l_1, const line l_2, double& t_1, double& t_2);
 DLL __host__ __device__ void cross(const line l_1, const ray l_2, double& t_1, double& t_2);
 DLL __host__ __device__ void cross(const line l_1, const seg l_2, double& t_1, double& t_2);
@@ -211,6 +220,8 @@ public:
 	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 
 	__host__ __device__ point center() const;
+
+	__host__ __device__ point fast_center() const;
 
 	__host__ __device__ vector move2center();
 

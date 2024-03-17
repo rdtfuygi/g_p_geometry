@@ -123,32 +123,32 @@ __host__ __device__ bool is_cross(const ray l_1, const seg l_2)
 {
 	double t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if ((t_1 > 0.001) && (t_2 > 0.001) && (l_2.dist - t_2 > 0.001))
+	if (t_1 == DBL_MAX)
 	{
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 __host__ __device__ bool is_cross(const ray l_1, const line l_2)
 {
 	double t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if (t_1 > 0.001)
+	if (t_1 == DBL_MAX)
 	{
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 __host__ __device__ bool is_cross(const ray l_1, const ray l_2)
 {
 	double t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if ((t_1 > 0.001) && (t_2 > 0.001))
+	if (t_1 == DBL_MAX)
 	{
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 

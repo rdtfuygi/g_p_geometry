@@ -43,6 +43,13 @@ __host__ __device__ double seg::point_dist(const point µã) const
 	}
 }
 
+__host__ __device__ void seg::norm()
+{
+	double l = length(dir);
+	dir /= l;
+	dist *= l;
+}
+
 void seg::print(cv::InputOutputArray Í¼Ïñ, double ±ÈÀı, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
 {
 	int ¸ß = Í¼Ïñ.rows(), ¿í = Í¼Ïñ.cols();
@@ -153,31 +160,31 @@ __host__ __device__ bool is_cross(const seg l_1, const seg l_2)
 {
 	double t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if (t_1 != DBL_MAX)
+	if (t_1 == DBL_MAX)
 	{
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 __host__ __device__ bool is_cross(const seg l_1, const ray l_2)
 {
 	double t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if ((t_1 > 0.001) && (l_1.dist - t_1 > 0.001) && (t_2 > 0.001))
+	if (t_1 == DBL_MAX)
 	{
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 __host__ __device__ bool is_cross(const seg l_1, const line l_2)
 {
 	double t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if ((t_1 > 0.001) && (l_1.dist - t_1 > 0.001))
+	if (t_1 == DBL_MAX)
 	{
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }

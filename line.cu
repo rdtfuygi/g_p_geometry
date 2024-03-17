@@ -47,6 +47,12 @@ __host__ __device__ double line::point_dist(const point µã) const
 	return abs(t_2);
 }
 
+__host__ __device__ void line::norm()
+{
+	double l = length(dir);
+	dir /= l;
+}
+
 void line::print(cv::InputOutputArray Í¼Ïñ, double ±ÈÀý, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
 {
 	int ¸ß = Í¼Ïñ.rows(), ¿í = Í¼Ïñ.cols();
@@ -59,6 +65,16 @@ void line::print(cv::InputOutputArray Í¼Ïñ, double ±ÈÀý, const cv::Scalar& ÑÕÉ«,
 	cv::line(Í¼Ïñ, µã_1, µã_2, ÑÕÉ«, ´ÖÏ¸);
 }
 
+
+__host__ __device__ double inc_angle_cos(const line l_1, const line l_2)
+{
+	return l_1.dir * l_2.dir;
+}
+
+DLL __host__ __device__ double inc_angle_sin(const line l_1, const line l_2)
+{
+	return l_1.dir ^ l_2.dir;
+}
 
 __host__ __device__ void cross(const line l_1, const line l_2, double& t_1, double& t_2)
 {

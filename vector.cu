@@ -95,6 +95,21 @@ void vector::print(cv::InputOutputArray Í¼Ïñ, double ±ÈÀı, const cv::Scalar& ÑÕÉ
 	cv::line(Í¼Ïñ, µã_1, µã_2, ÑÕÉ«, ´ÖÏ¸);
 }
 
+__host__ __device__ double inc_angle_cos(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
+{	
+	return ÏòÁ¿_1.unitize() * ÏòÁ¿_2.unitize();
+}
+
+__host__ __device__ double inc_angle_sin(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
+{
+	return ÏòÁ¿_1.unitize() ^ ÏòÁ¿_2.unitize();
+}
+
+__host__ __device__ vector operator-(vector ÏòÁ¿)
+{
+	return vector(-ÏòÁ¿[0], -ÏòÁ¿[1]);
+}
+
 __host__ __device__ vector operator+(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
 {
 	return vector(ÏòÁ¿_1[0] + ÏòÁ¿_2[0], ÏòÁ¿_1[1] + ÏòÁ¿_2[1]);

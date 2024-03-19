@@ -451,7 +451,6 @@ __host__ __device__ void poly::reset_seg(int i)
 	{
 		return;
 	}
-	seg_change = false;
 
 	area_change = true;
 	center_change = true;

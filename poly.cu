@@ -33,7 +33,15 @@ __host__ __device__ void sort(double* list, int n, bool up = true)
 
 
 
-__host__ __device__ poly::poly() {}
+__host__ __device__ poly::poly()
+{
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
+}
 
 __host__ __device__ poly::poly(const point* 点, int m)
 {
@@ -47,6 +55,13 @@ __host__ __device__ poly::poly(const point* 点, int m)
 		segs[i] = seg(点[temp], 点[temp + 1]);
 	}
 	segs[20 - 1] = seg(点[temp - 1], 点[0]);
+
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
 }
 
 poly::poly(std::vector<point>& 点)
@@ -61,6 +76,13 @@ poly::poly(std::vector<point>& 点)
 		segs[i] = seg(点[点.size() - 1], 点[点.size() - 1]);
 	}
 	segs[20 - 1] = seg(点[temp - 1], 点[0]);
+
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
 }
 
 poly::poly(const tirangle 三角)
@@ -69,11 +91,23 @@ poly::poly(const tirangle 三角)
 	segs[1] = 三角.segs[1];
 	segs[2] = 三角.segs[2];
 	reset_seg();
+
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
 }
 
-__host__ __device__ bool poly::legal()
+__host__ __device__ bool poly::legal() const
 {
-	reset_seg();
+	if (!legal_change)
+	{
+		return legal_;
+	}
+	legal_change = false;
+
 	for (int i = 1; i < 19; i++)
 	{
 		for (int j = 0; j < i - 1; j++)
@@ -86,6 +120,7 @@ __host__ __device__ bool poly::legal()
 			cross(segs[i], segs[j], t1, t2);
 			if ((t2 > 0.001) && (t2 < segs[j].dist - 0.001))
 			{
+				legal_= false;
 				return false;
 			}
 		}
@@ -100,10 +135,11 @@ __host__ __device__ bool poly::legal()
 		cross(segs[19], segs[j], t1, t2);
 		if ((t2 > 0.001) && (t2 < segs[j].dist - 0.001))
 		{
+			legal_ = false;
 			return false;
 		}
 	}
-
+	legal_ = true;
 	return true;
 }
 
@@ -253,8 +289,15 @@ __host__ __device__ bool poly::legal()
 //	return output;
 //}
 
-__host__ __device__ void poly::point_get(point*& 点) const
+__host__ __device__ void poly::point_get(point*& 点) 
 {
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
+
 	if (点 != nullptr)
 	{
 		delete[]点;
@@ -266,8 +309,15 @@ __host__ __device__ void poly::point_get(point*& 点) const
 	}
 }
 
-void poly::point_get(std::vector<point>& 点) const
+void poly::point_get(std::vector<point>& 点) 
 {
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
+
 	点 = std::vector<point>(20);
 	for (int i = 0; i < 20 ; i++)
 	{
@@ -275,8 +325,15 @@ void poly::point_get(std::vector<point>& 点) const
 	}
 }
 
-__host__ __device__ void poly::seg_get(seg*& 线段) const
+__host__ __device__ void poly::seg_get(seg*& 线段) 
 {
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
+
 	if (线段 != nullptr)
 	{
 		delete[]线段;
@@ -288,8 +345,15 @@ __host__ __device__ void poly::seg_get(seg*& 线段) const
 	}
 }
 
-void poly::seg_get(std::vector<seg>& 线段) const
+void poly::seg_get(std::vector<seg>& 线段) 
 {
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
+
 	线段 = std::vector<seg>(20);
 	for (int i = 0; i < 20 ; i++)
 	{
@@ -347,6 +411,16 @@ __host__ __device__ bool poly::point_in(point 点) const
 
 __host__ __device__ void poly::reset_seg()
 {
+	if (!seg_change)
+	{
+		return;
+	}
+	seg_change = false;
+
+	area_change = true;
+	center_change = true;
+	legal_change = true;
+
 	for (int i = 0, n = 0; (i < 20 - 1) && (n < 20); i++)
 	{
 		if ((abs(segs[i].origin[0] - segs[i + 1].origin[0]) > 0.001) || (abs(segs[i].origin[1] - segs[i + 1].origin[1]) > 0.001))
@@ -373,11 +447,28 @@ __host__ __device__ void poly::reset_seg()
 
 __host__ __device__ void poly::reset_seg(int i)
 {
+	if (!seg_change)
+	{
+		return;
+	}
+	seg_change = false;
+
+	area_change = true;
+	center_change = true;
+	legal_change = true;
+
 	segs[i] = seg(segs[i].origin, segs[(i + 1) % 20].origin);
 }
 
 __host__ __device__ seg& poly::operator[](int i)
 {
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
+
 	while (i < 0)
 	{
 		i += 20;
@@ -396,12 +487,20 @@ __host__ __device__ seg poly::operator[](int i) const
 
 __host__ __device__ double poly::dir_area() const
 {
+	if (!dir_area_change)
+	{
+		return dir_area_;
+	}
+	dir_area_change = false;
 	double s = 0;
 	for (int i = 0; i < 20 - 1; i++)
 	{
 		s += vector(segs[i].origin) ^ vector(segs[i + 1].origin);
 	}
 	s += vector(segs[20 - 1].origin) ^ vector(segs[0].origin);
+
+
+	dir_area_ = s / 2;
 	return s / 2;
 }
 
@@ -463,6 +562,11 @@ __global__ void poly_area(seg* segs, double min_x, double min_y, double max_x, d
 
 __host__ __device__ double poly::area() const
 {
+	if (!area_change)
+	{
+		return area_;
+	}
+	area_change = false;
 	point max = segs[0].origin, min = segs[0].origin;
 	for (int i = 1; i < 20; i++)
 	{
@@ -471,7 +575,6 @@ __host__ __device__ double poly::area() const
 		min[0] = (min[0] < segs[i].origin[0]) ? min[0] : segs[i].origin[0];
 		min[1] = (min[1] < segs[i].origin[1]) ? min[1] : segs[i].origin[1];
 	}
-
 
 #ifndef __CUDACC__
 	int device_n;
@@ -502,6 +605,7 @@ __host__ __device__ double poly::area() const
 			output += output_h[i];
 		}
 		delete[]output_h;
+		area_ = output;
 		return output;
 	}
 
@@ -553,6 +657,7 @@ __host__ __device__ double poly::area() const
 			output += dist[2 * i + 1] - dist[2 * i];
 		}
 	}
+	area_ = output;
 	return output;
 }
 
@@ -626,17 +731,11 @@ __global__ void poly_center(seg* segs, double min_x, double min_y, double max_x,
 
 __host__ __device__ point poly::center() const
 {
-	//double s = 0;
-	//double x = 0, y = 0;
-	//for (int i = 0; i < 19; i++)
-	//{
-	//	double 积 = segs[i].dir ^ segs[i + 1].dir;
-	//	x += (segs[i].origin[0] + segs[i + 1].origin[0]) * 积;
-	//	y += (segs[i].origin[1] + segs[i + 1].origin[1]) * 积;
-	//	s += 积;
-	//}
-	//s *= 6;
-	//return point(x / s, y / s);
+	if (!center_change)
+	{
+		return center_;
+	}
+	center_change = false;
 
 	point max = segs[0].origin, min = segs[0].origin;
 	for (int i = 1; i < 20; i++)
@@ -691,6 +790,7 @@ __host__ __device__ point poly::center() const
 		delete[]p_area_h;
 		delete[]x_h;
 		delete[]y_h;
+		center_= point(x / p_area, y / 2 / p_area);
 		return point(x / p_area, y / 2 / p_area);
 	}
 
@@ -728,26 +828,35 @@ __host__ __device__ point poly::center() const
 		}
 		x_ += d_x * x;
 	}
+
+	center_ = point(x_ / p_area, y_ / 2 / p_area);
 	return point(x_ / p_area, y_ / 2 / p_area);
 }
 
 __host__ __device__ point poly::fast_center() const
 {
+	if (!fast_center_change)
+	{
+		return fast_center_;
+	}
+	fast_center_change = false;
+
 	double s = 0;
-	point center_(0.0, 0.0);
+	point center__(0.0, 0.0);
 	for (int i = 0; i < 19; i++)
 	{
 		double a = vector(segs[i].origin) ^ vector(segs[i + 1].origin);
 		s += a;
-		center_ = point(vector(center_) + a * (vector(segs[i].origin) + vector(segs[i + 1].origin)));
+		center__ = point(vector(center__) + a * (vector(segs[i].origin) + vector(segs[i + 1].origin)));
 	}
 	{
 		double a = vector(segs[19].origin) ^ vector(segs[0].origin);
 		s += a;
-		center_ = point(vector(center_) + a * (vector(segs[19].origin) + vector(segs[0].origin)));
+		center__ = point(vector(center__) + a * (vector(segs[19].origin) + vector(segs[0].origin)));
 	}
-	center_ = point(vector(center_) / s / 3);
-	return center_;
+	center__ = point(vector(center__) / s / 3);
+	fast_center_ = center__;
+	return center__;
 }
 
 vector poly::move2center()
@@ -764,6 +873,13 @@ vector poly::move2center()
 
 __host__ __device__ void poly::simple(double 角度, bool rad)
 {
+	area_change = true;
+	dir_area_change = true;
+	center_change = true;
+	fast_center_change = true;
+	legal_change = true;
+	seg_change = true;
+
 	if (!rad)
 	{
 		角度 = deg2rad(角度);
@@ -898,13 +1014,13 @@ __global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double ma
 	for (int j = 0; j < 20; j++)
 	{
 		double t_1, t_2;
-		cross(temp, p_1.segs[j], t_1, t_2);
+		cross(temp, p_1[j], t_1, t_2);
 		dist[0][j] = t_1;
 		if (t_1 != DBL_MAX)
 		{
 			in_1 = !in_1;
 		}
-		cross(temp, p_2.segs[j], t_1, t_2);
+		cross(temp, p_2[j], t_1, t_2);
 		dist[1][j] = t_1;
 		if (t_1 != DBL_MAX)
 		{
@@ -950,21 +1066,21 @@ __global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double ma
 
 __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 {
-	point max_1 = p_1.segs[0].origin, min_1 = p_1.segs[0].origin;
+	point max_1 = p_1[0].origin, min_1 = p_1[0].origin;
 	for (int i = 1; i < 20; i++)
 	{
-		max_1[0] = (max_1[0] > p_1.segs[i].origin[0]) ? max_1[0] : p_1.segs[i].origin[0];
-		max_1[1] = (max_1[1] > p_1.segs[i].origin[1]) ? max_1[1] : p_1.segs[i].origin[1];
-		min_1[0] = (min_1[0] < p_1.segs[i].origin[0]) ? min_1[0] : p_1.segs[i].origin[0];
-		min_1[1] = (min_1[1] < p_1.segs[i].origin[1]) ? min_1[1] : p_1.segs[i].origin[1];
+		max_1[0] = (max_1[0] > p_1[i].origin[0]) ? max_1[0] : p_1[i].origin[0];
+		max_1[1] = (max_1[1] > p_1[i].origin[1]) ? max_1[1] : p_1[i].origin[1];
+		min_1[0] = (min_1[0] < p_1[i].origin[0]) ? min_1[0] : p_1[i].origin[0];
+		min_1[1] = (min_1[1] < p_1[i].origin[1]) ? min_1[1] : p_1[i].origin[1];
 	}
-	point max_2 = p_2.segs[0].origin, min_2 = p_2.segs[0].origin;
+	point max_2 = p_2[0].origin, min_2 = p_2[0].origin;
 	for (int i = 0; i < 20; i++)
 	{
-		max_2[0] = (max_2[0] > p_2.segs[i].origin[0]) ? max_2[0] : p_2.segs[i].origin[0];
-		max_2[1] = (max_2[1] > p_2.segs[i].origin[1]) ? max_2[1] : p_2.segs[i].origin[1];
-		min_2[0] = (min_2[0] < p_2.segs[i].origin[0]) ? min_2[0] : p_2.segs[i].origin[0];
-		min_2[1] = (min_2[1] < p_2.segs[i].origin[1]) ? min_2[1] : p_2.segs[i].origin[1];
+		max_2[0] = (max_2[0] > p_2[i].origin[0]) ? max_2[0] : p_2[i].origin[0];
+		max_2[1] = (max_2[1] > p_2[i].origin[1]) ? max_2[1] : p_2[i].origin[1];
+		min_2[0] = (min_2[0] < p_2[i].origin[0]) ? min_2[0] : p_2[i].origin[0];
+		min_2[1] = (min_2[1] < p_2[i].origin[1]) ? min_2[1] : p_2[i].origin[1];
 	}
 
 	point max(fmin(max_1[0], max_2[0]), fmin(max_1[1], max_2[1])), min(fmax(min_1[0], min_2[0]), fmax(min_1[1], min_2[1]));
@@ -1019,13 +1135,13 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 		for (int j = 0; j < 20; j++)
 		{
 			double t_1, t_2;
-			cross(temp, p_1.segs[j], t_1, t_2);
+			cross(temp, p_1[j], t_1, t_2);
 			dist[0][j] = t_1;
 			if (t_1 != DBL_MAX)
 			{
 				in_1 = !in_1;
 			}
-			cross(temp, p_2.segs[j], t_1, t_2);
+			cross(temp, p_2[j], t_1, t_2);
 			dist[1][j] = t_1;
 			if (t_1 != DBL_MAX)
 			{

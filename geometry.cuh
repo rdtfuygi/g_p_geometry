@@ -183,20 +183,35 @@ public:
 
 class DLL poly
 {
-public:
+protected:
+	mutable bool legal_change;
+	mutable bool area_change;
+	mutable bool dir_area_change;
+	mutable bool center_change;
+	mutable bool fast_center_change;
+
+	mutable bool legal_;
+	mutable double area_;
+	mutable double dir_area_;
+	mutable point center_;
+	mutable point fast_center_;
+
+	bool seg_change;
 	seg segs[20];
+public:
 
 	__host__ __device__ poly();
 	__host__ __device__ poly(const point* 点, int m = 20);
 	poly(std::vector<point>& 点);
 	__host__ __device__ poly(const tirangle 三角);
 
-	__host__ __device__ bool legal();
+	__host__ __device__ bool legal() const;
 
-	__host__ __device__ void point_get(point*& 点) const;
-	void point_get(std::vector<point>& 点) const;
-	__host__ __device__ void seg_get(seg*& 线段) const;
-	void seg_get(std::vector<seg>& 线段) const;
+	__host__ __device__ void point_get(point*& 点);
+	void point_get(std::vector<point>& 点);
+	__host__ __device__ void seg_get(seg*& 线段);
+	void seg_get(std::vector<seg>& 线段);
+
 	__host__ __device__ bool point_in(point 点) const;
 
 	__host__ __device__ void reset_seg();

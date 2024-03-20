@@ -196,8 +196,10 @@ protected:
 	mutable point center_;
 	mutable point fast_center_;
 
-	bool seg_change;
+	mutable bool seg_change;
 	seg segs[20];
+
+	void changed() const;
 public:
 
 	__host__ __device__ poly();

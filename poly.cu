@@ -33,7 +33,7 @@ __host__ __device__ void sort(double* list, int n, bool up = true)
 
 
 
-__host__ __device__ poly::poly()
+void poly::changed() const
 {
 	area_change = true;
 	dir_area_change = true;
@@ -41,6 +41,11 @@ __host__ __device__ poly::poly()
 	fast_center_change = true;
 	legal_change = true;
 	seg_change = true;
+}
+
+__host__ __device__ poly::poly()
+{
+	changed();
 }
 
 __host__ __device__ poly::poly(const point* 点, int m)
@@ -56,12 +61,7 @@ __host__ __device__ poly::poly(const point* 点, int m)
 	}
 	segs[20 - 1] = seg(点[temp - 1], 点[0]);
 
-	area_change = true;
-	dir_area_change = true;
-	center_change = true;
-	fast_center_change = true;
-	legal_change = true;
-	seg_change = true;
+	changed();
 }
 
 poly::poly(std::vector<point>& 点)
@@ -77,12 +77,7 @@ poly::poly(std::vector<point>& 点)
 	}
 	segs[20 - 1] = seg(点[temp - 1], 点[0]);
 
-	area_change = true;
-	dir_area_change = true;
-	center_change = true;
-	fast_center_change = true;
-	legal_change = true;
-	seg_change = true;
+	changed();
 }
 
 poly::poly(const tirangle 三角)
@@ -92,12 +87,7 @@ poly::poly(const tirangle 三角)
 	segs[2] = 三角.segs[2];
 	reset_seg();
 
-	area_change = true;
-	dir_area_change = true;
-	center_change = true;
-	fast_center_change = true;
-	legal_change = true;
-	seg_change = true;
+	changed();
 }
 
 __host__ __device__ bool poly::legal() const
@@ -291,12 +281,7 @@ __host__ __device__ bool poly::legal() const
 
 __host__ __device__ void poly::point_get(point*& 点) 
 {
-	area_change = true;
-	dir_area_change = true;
-	center_change = true;
-	fast_center_change = true;
-	legal_change = true;
-	seg_change = true;
+	changed();
 
 	if (点 != nullptr)
 	{
@@ -311,12 +296,7 @@ __host__ __device__ void poly::point_get(point*& 点)
 
 void poly::point_get(std::vector<point>& 点) 
 {
-	area_change = true;
-	dir_area_change = true;
-	center_change = true;
-	fast_center_change = true;
-	legal_change = true;
-	seg_change = true;
+	changed();
 
 	点 = std::vector<point>(20);
 	for (int i = 0; i < 20 ; i++)
@@ -327,12 +307,7 @@ void poly::point_get(std::vector<point>& 点)
 
 __host__ __device__ void poly::seg_get(seg*& 线段) 
 {
-	area_change = true;
-	dir_area_change = true;
-	center_change = true;
-	fast_center_change = true;
-	legal_change = true;
-	seg_change = true;
+	changed();
 
 	if (线段 != nullptr)
 	{
@@ -347,12 +322,7 @@ __host__ __device__ void poly::seg_get(seg*& 线段)
 
 void poly::seg_get(std::vector<seg>& 线段) 
 {
-	area_change = true;
-	dir_area_change = true;
-	center_change = true;
-	fast_center_change = true;
-	legal_change = true;
-	seg_change = true;
+	changed();
 
 	线段 = std::vector<seg>(20);
 	for (int i = 0; i < 20 ; i++)
@@ -461,12 +431,7 @@ __host__ __device__ void poly::reset_seg(int i)
 
 __host__ __device__ seg& poly::operator[](int i)
 {
-	area_change = true;
-	dir_area_change = true;
-	center_change = true;
-	fast_center_change = true;
-	legal_change = true;
-	seg_change = true;
+	changed();
 
 	while (i < 0)
 	{
@@ -872,12 +837,7 @@ vector poly::move2center()
 
 __host__ __device__ void poly::simple(double 角度, bool rad)
 {
-	area_change = true;
-	dir_area_change = true;
-	center_change = true;
-	fast_center_change = true;
-	legal_change = true;
-	seg_change = true;
+	changed();
 
 	if (!rad)
 	{
@@ -904,11 +864,13 @@ __host__ __device__ void poly::simple(double 角度, bool rad)
 			if (i == 18)
 			{
 				segs[19].origin = segs[0].origin;
+				changed();
 			}
 
 			for (int k = i + 1; k < 20 - 1; k++)
 			{
 				segs[k].origin = segs[k + 1].origin;
+				changed();
 			}
 			reset_seg();
 		}
@@ -933,6 +895,7 @@ __host__ __device__ void poly::simple(double 角度, bool rad)
 		for (int j = 0; j < 20 - 1; j++)
 		{
 			segs[j].origin = segs[j + 1].origin;
+			changed();
 		}
 		reset_seg();
 	}

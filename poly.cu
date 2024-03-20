@@ -2,7 +2,7 @@
 
 
 
-__host__ __device__ void sort(double* list, int n, bool up = true)
+__host__ __device__ void sort(float* list, int n, bool up = true)
 {
 	for (int i = n - 1; i > 0; i--)
 	{
@@ -11,14 +11,14 @@ __host__ __device__ void sort(double* list, int n, bool up = true)
 		{
 			if ((list[j] > list[j + 1]) && up)
 			{
-				double temp_dist = list[j];
+				float temp_dist = list[j];
 				list[j] = list[j + 1];
 				list[j + 1] = temp_dist;
 				swap = true;
 			}
 			else if ((list[j] < list[j + 1]) && !up)
 			{
-				double temp_dist = list[j];
+				float temp_dist = list[j];
 				list[j] = list[j + 1];
 				list[j + 1] = temp_dist;
 				swap = true;
@@ -106,7 +106,7 @@ __host__ __device__ bool poly::legal() const
 			{
 				continue;
 			}
-			double t1, t2;
+			float t1, t2;
 			cross(segs[i], segs[j], t1, t2);
 			if ((t2 > 0.001) && (t2 < segs[j].dist - 0.001))
 			{
@@ -121,7 +121,7 @@ __host__ __device__ bool poly::legal() const
 		{
 			continue;
 		}
-		double t1, t2;
+		float t1, t2;
 		cross(segs[19], segs[j], t1, t2);
 		if ((t2 > 0.001) && (t2 < segs[j].dist - 0.001))
 		{
@@ -133,7 +133,7 @@ __host__ __device__ bool poly::legal() const
 	return true;
 }
 
-//__host__ __device__ double poly::one_link_area()
+//__host__ __device__ float poly::one_link_area()
 //{
 //	point max = segs[0].origin, min = segs[0].origin;
 //	for (int i = 1; i < 20; i++)
@@ -145,14 +145,14 @@ __host__ __device__ bool poly::legal() const
 //	}
 //
 //
-//	double last[20];
+//	float last[20];
 //	{
 //		ray temp;
 //		temp.origin = point(int(min[0] + 1), min[1]);
 //		temp.dir = vector(0.0, 1.0);
 //		for (int i = 0; i < 20; i++)
 //		{
-//			double t_1, t_2;
+//			float t_1, t_2;
 //			cross(temp, segs[i], t_1, t_2);
 //			last[i] = t_1;
 //		}
@@ -165,7 +165,7 @@ __host__ __device__ bool poly::legal() const
 //				{
 //					continue;
 //				}
-//				double temp_dist = last[j];
+//				float temp_dist = last[j];
 //				last[j] = last[j + 1];
 //				last[j + 1] = temp_dist;
 //				swap = true;
@@ -178,7 +178,7 @@ __host__ __device__ bool poly::legal() const
 //	}
 //
 //
-//	double areas[10];
+//	float areas[10];
 //	char map[10] = { 0,1,2,3,4,5,6,7,8,9 };
 //	for (int i = 0; i < 10; i++)
 //	{
@@ -194,7 +194,7 @@ __host__ __device__ bool poly::legal() const
 //
 //	for (int x = min[0] + 2; x < max[0]; x++)
 //	{
-//		double dist[20];
+//		float dist[20];
 //		char map_new[10] = { 10,10,10,10,10,10,10,10,10,10 };
 //
 //		seg temp;
@@ -203,7 +203,7 @@ __host__ __device__ bool poly::legal() const
 //		temp.dist = max[1] - min[1];
 //		for (int i = 0; i < 20; i++)
 //		{
-//			double t_1, t_2;
+//			float t_1, t_2;
 //			cross(temp, segs[i], t_1, t_2);
 //			dist[i] = t_1;
 //		}
@@ -214,7 +214,7 @@ __host__ __device__ bool poly::legal() const
 //			{
 //				if (dist[j] > dist[j + 1])
 //				{
-//					double temp_dist = dist[j];
+//					float temp_dist = dist[j];
 //					dist[j] = dist[j + 1];
 //					dist[j + 1] = temp_dist;
 //					swap = true;
@@ -270,7 +270,7 @@ __host__ __device__ bool poly::legal() const
 //			}
 //		}
 //	}
-//	double output = 0;
+//	float output = 0;
 //	for (int i = 0; i < 10; i++)
 //	{
 //		output = (areas[i] > output) ? areas[i] : output;
@@ -449,14 +449,14 @@ __host__ __device__ seg poly::operator[](int i) const
 	return segs[i % 20];
 }
 
-__host__ __device__ double poly::dir_area() const
+__host__ __device__ float poly::dir_area() const
 {
 	if (!dir_area_change)
 	{
 		return dir_area_;
 	}
 	dir_area_change = false;
-	double s = 0;
+	float s = 0;
 	for (int i = 0; i < 20 - 1; i++)
 	{
 		s += vector(segs[i].origin) ^ vector(segs[i + 1].origin);
@@ -469,7 +469,7 @@ __host__ __device__ double poly::dir_area() const
 }
 
 
-__global__ void poly_area(seg* segs, double min_x, double min_y, double max_x, double max_y, double* output)
+__global__ void poly_area(seg* segs, float min_x, float min_y, float max_x, float max_y, float* output)
 {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
 	int x = min_x + idx;
@@ -477,19 +477,19 @@ __global__ void poly_area(seg* segs, double min_x, double min_y, double max_x, d
 	{
 		return;
 	}
-	double min[2] = { min_x,min_y };
-	double max[2] = { max_x,max_y };
+	float min[2] = { min_x,min_y };
+	float max[2] = { max_x,max_y };
 
 	seg temp;
 	temp.origin = point(x, min[1]);
 	temp.dir = vector(0.0, 1.0);
 	temp.dist = max[1] - min[1];
 
-	double dist[20];
+	float dist[20];
 
 	for (int i = 0; i < 20; i++)
 	{
-		double t_1, t_2;
+		float t_1, t_2;
 		cross(temp, segs[i], t_1, t_2);
 		dist[i] = t_1;
 	}
@@ -501,7 +501,7 @@ __global__ void poly_area(seg* segs, double min_x, double min_y, double max_x, d
 	//	{
 	//		if (dist[j] > dist[j + 1])
 	//		{
-	//			double temp_dist = dist[j];
+	//			float temp_dist = dist[j];
 	//			dist[j] = dist[j + 1];
 	//			dist[j + 1] = temp_dist;
 	//			swap = true;
@@ -524,7 +524,7 @@ __global__ void poly_area(seg* segs, double min_x, double min_y, double max_x, d
 	}
 }
 
-__host__ __device__ double poly::area() const
+__host__ __device__ float poly::area() const
 {
 	if (!area_change)
 	{
@@ -549,8 +549,8 @@ __host__ __device__ double poly::area() const
 		seg* segs_d = NULL;
 		cudaMalloc((void**)&segs_d, sizeof(seg) * 20);
 		cudaMemcpy(segs_d, segs, sizeof(seg) * 20, cudaMemcpyHostToDevice);
-		double* output_d = NULL;
-		cudaMalloc((void**)&output_d, sizeof(double) * int(max[0] - min[0]));
+		float* output_d = NULL;
+		cudaMalloc((void**)&output_d, sizeof(float) * int(max[0] - min[0]));
 
 		cudaDeviceProp deviceProp;
 		cudaGetDeviceProperties(&deviceProp, 0);
@@ -560,10 +560,10 @@ __host__ __device__ double poly::area() const
 		poly_area << < 块, 每块线程 >> > (segs_d, min[0], min[1], max[0], max[1], output_d);
 		cudaFree(segs_d);
 
-		double* output_h = new double[int(max[0] - min[0])];
-		cudaMemcpy(output_h, output_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		float* output_h = new float[int(max[0] - min[0])];
+		cudaMemcpy(output_h, output_d, sizeof(float) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
 		cudaFree(output_d);
-		double output = 0;
+		float output = 0;
 		for (int i = 0; i<int(max[0] - min[0]); i++)
 		{
 			output += output_h[i];
@@ -576,7 +576,7 @@ __host__ __device__ double poly::area() const
 #endif
 
 
-	double output = 0;
+	float output = 0;
 	for (int x = min[0]; x < max[0]; x++)
 	{
 		seg temp;
@@ -584,11 +584,11 @@ __host__ __device__ double poly::area() const
 		temp.dir = vector(0.0, 1.0);
 		temp.dist = max[1] - min[1];
 
-		double dist[20];
+		float dist[20];
 
 		for (int i = 0; i < 20; i++)
 		{
-			double t_1, t_2;
+			float t_1, t_2;
 			cross(temp, segs[i], t_1, t_2);
 			dist[i] = t_1;
 		}
@@ -600,7 +600,7 @@ __host__ __device__ double poly::area() const
 		//	{
 		//		if (dist[j] > dist[j + 1])
 		//		{
-		//			double temp_dist = dist[j];
+		//			float temp_dist = dist[j];
 		//			dist[j] = dist[j + 1];
 		//			dist[j + 1] = temp_dist;
 		//			swap = true;
@@ -625,7 +625,7 @@ __host__ __device__ double poly::area() const
 	return output;
 }
 
-void poly::print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细) const
+void poly::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细) const
 {
 	//seg(segs[0].origin, segs[1].origin).print(图像, 比例, 颜色, 粗细 * 2);
 	for (int i = 0; i < 19; i++)
@@ -636,7 +636,7 @@ void poly::print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色,
 	//segs[0].origin.print(图像, 比例, 颜色, 粗细 * 4);
 }
 
-__global__ void poly_center(seg* segs, double min_x, double min_y, double max_x, double max_y, double* p_area, double* x_, double* y_)
+__global__ void poly_center(seg* segs, float min_x, float min_y, float max_x, float max_y, float* p_area, float* x_, float* y_)
 {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
 	int x = min_x + idx;
@@ -644,19 +644,19 @@ __global__ void poly_center(seg* segs, double min_x, double min_y, double max_x,
 	{
 		return;
 	}
-	double min[2] = { min_x,min_y };
-	double max[2] = { max_x,max_y };
+	float min[2] = { min_x,min_y };
+	float max[2] = { max_x,max_y };
 
 	seg temp;
 	temp.origin = point(x, min[1]);
 	temp.dir = vector(0.0, 1.0);
 	temp.dist = max[1] - min[1];
 
-	double dist[20];
+	float dist[20];
 
 	for (int i = 0; i < 20; i++)
 	{
-		double t_1, t_2;
+		float t_1, t_2;
 		cross(temp, segs[i], t_1, t_2);
 		dist[i] = t_1;
 	}
@@ -668,7 +668,7 @@ __global__ void poly_center(seg* segs, double min_x, double min_y, double max_x,
 	//	{
 	//		if (dist[j] > dist[j + 1])
 	//		{
-	//			double temp_dist = dist[j];
+	//			float temp_dist = dist[j];
 	//			dist[j] = dist[j + 1];
 	//			dist[j + 1] = temp_dist;
 	//			swap = true;
@@ -720,12 +720,12 @@ __host__ __device__ point poly::center() const
 		seg* segs_d = NULL;//
 		cudaMalloc((void**)&segs_d, sizeof(seg) * 20);
 		cudaMemcpy(segs_d, segs, sizeof(seg) * 20, cudaMemcpyHostToDevice);
-		double* p_area_d = NULL;//
-		cudaMalloc((void**)&p_area_d, sizeof(double) * int(max[0] - min[0]));
-		double* x_d = NULL;//
-		cudaMalloc((void**)&x_d, sizeof(double) * int(max[0] - min[0]));
-		double* y_d = NULL;//
-		cudaMalloc((void**)&y_d, sizeof(double) * int(max[0] - min[0]));
+		float* p_area_d = NULL;//
+		cudaMalloc((void**)&p_area_d, sizeof(float) * int(max[0] - min[0]));
+		float* x_d = NULL;//
+		cudaMalloc((void**)&x_d, sizeof(float) * int(max[0] - min[0]));
+		float* y_d = NULL;//
+		cudaMalloc((void**)&y_d, sizeof(float) * int(max[0] - min[0]));
 
 		cudaDeviceProp deviceProp;
 		cudaGetDeviceProperties(&deviceProp, 0);
@@ -735,16 +735,16 @@ __host__ __device__ point poly::center() const
 		poly_center << < 块, 每块线程 >> > (segs_d, min[0], min[1], max[0], max[1], p_area_d, x_d, y_d);
 		cudaFree(segs_d);
 
-		double* p_area_h = new double[int(max[0] - min[0])];
-		cudaMemcpy(p_area_h, p_area_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
-		double* x_h = new double[int(max[0] - min[0])];
-		cudaMemcpy(x_h, x_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
-		double* y_h = new double[int(max[0] - min[0])];
-		cudaMemcpy(y_h, y_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		float* p_area_h = new float[int(max[0] - min[0])];
+		cudaMemcpy(p_area_h, p_area_d, sizeof(float) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		float* x_h = new float[int(max[0] - min[0])];
+		cudaMemcpy(x_h, x_d, sizeof(float) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		float* y_h = new float[int(max[0] - min[0])];
+		cudaMemcpy(y_h, y_d, sizeof(float) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
 		cudaFree(p_area_d);
 		cudaFree(x_d);
 		cudaFree(y_d);
-		double p_area = 0, x = 0, y = 0;
+		float p_area = 0, x = 0, y = 0;
 		for (int i = 0; i<int(max[0] - min[0]); i++)
 		{
 			p_area += p_area_h[i];
@@ -761,7 +761,7 @@ __host__ __device__ point poly::center() const
 #endif
 
 
-	double p_area = 0, x_ = 0, y_ = 0;
+	float p_area = 0, x_ = 0, y_ = 0;
 	for (int x = min[0]; x < max[0]; x++)
 	{
 		seg temp;
@@ -769,17 +769,17 @@ __host__ __device__ point poly::center() const
 		temp.dir = vector(0.0, 1.0);
 		temp.dist = max[1] - min[1];
 
-		double dist[20];
+		float dist[20];
 
 		for (int i = 0; i < 20; i++)
 		{
-			double t_1, t_2;
+			float t_1, t_2;
 			cross(temp, segs[i], t_1, t_2);
 			dist[i] = t_1;
 		}
 		sort(dist, 20);
 
-		double d_x = 0;
+		float d_x = 0;
 		for (int i = 0; i < 10; i++)
 		{
 			if ((dist[2 * i + 1] == DBL_MAX) || (dist[2 * i] == DBL_MAX))
@@ -805,16 +805,16 @@ __host__ __device__ point poly::fast_center() const
 	}
 	fast_center_change = false;
 
-	double s = 0;
+	float s = 0;
 	point center__(0.0, 0.0);
 	for (int i = 0; i < 19; i++)
 	{
-		double a = vector(segs[i].origin) ^ vector(segs[i + 1].origin);
+		float a = vector(segs[i].origin) ^ vector(segs[i + 1].origin);
 		s += a;
 		center__ = point(vector(center__) + a * (vector(segs[i].origin) + vector(segs[i + 1].origin)));
 	}
 	{
-		double a = vector(segs[19].origin) ^ vector(segs[0].origin);
+		float a = vector(segs[19].origin) ^ vector(segs[0].origin);
 		s += a;
 		center__ = point(vector(center__) + a * (vector(segs[19].origin) + vector(segs[0].origin)));
 	}
@@ -835,7 +835,7 @@ vector poly::move2center()
 	return vector(0.0, 0.0) - move;
 }
 
-__host__ __device__ void poly::simple(double 角度, bool rad)
+__host__ __device__ void poly::simple(float 角度, bool rad)
 {
 	changed();
 
@@ -843,7 +843,7 @@ __host__ __device__ void poly::simple(double 角度, bool rad)
 	{
 		角度 = deg2rad(角度);
 	}
-	double cos_ = cos(角度);
+	float cos_ = cos(角度);
 
 	reset_seg();
 	int n = 1;
@@ -854,7 +854,7 @@ __host__ __device__ void poly::simple(double 角度, bool rad)
 		{
 			i = j - 1;
 
-			double cos_t = (vector(0.0, 0.0) - segs[i].dir) * segs[j].dir;
+			float cos_t = (vector(0.0, 0.0) - segs[i].dir) * segs[j].dir;
 			if ((cos_t < cos_) || (segs[i].dist < 0.0001) || (segs[j].dist < 0.0001))
 			{
 				continue;
@@ -885,7 +885,7 @@ __host__ __device__ void poly::simple(double 角度, bool rad)
 			}
 		}
 
-		double cos_t = (vector(0.0, 0.0) - dir_) * segs[0].dir;
+		float cos_t = (vector(0.0, 0.0) - dir_) * segs[0].dir;
 		if (cos_t < cos_)
 		{
 			continue;
@@ -925,7 +925,7 @@ __host__ __device__ bool poly::full_overlap(const poly other) const
 	return true;
 }
 
-__host__ __device__ double poly::overlap_area(const poly other) const
+__host__ __device__ float poly::overlap_area(const poly other) const
 {
 	return ::overlap_area(*this, other);
 }
@@ -954,7 +954,7 @@ __host__ __device__ bool is_overlap(const poly p_1, const poly p_2)
 }
 
 
-__global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double max_x, double max_y, double* output)
+__global__ void overlap_area_cuda(poly* p, float min_x, float min_y, float max_x, float max_y, float* output)
 {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
 	int i = min_x + idx;
@@ -962,8 +962,8 @@ __global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double ma
 	{
 		return;
 	}
-	double min[2] = { min_x,min_y };
-	double max[2] = { max_x,max_y };
+	float min[2] = { min_x,min_y };
+	float max[2] = { max_x,max_y };
 	poly p_1 = p[0], p_2 = p[1];
 
 	ray temp;
@@ -972,10 +972,10 @@ __global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double ma
 
 
 	bool in_1 = false, in_2 = false;
-	double dist[2][20];
+	float dist[2][20];
 	for (int j = 0; j < 20; j++)
 	{
-		double t_1, t_2;
+		float t_1, t_2;
 		cross(temp, p_1[j], t_1, t_2);
 		dist[0][j] = t_1;
 		if (t_1 != DBL_MAX)
@@ -995,7 +995,7 @@ __global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double ma
 	int j = 0, k = 0;
 	while ((j < 20) && (k < 20))
 	{
-		double next_1 = min[1] + dist[0][j] - temp.origin[1], next_2 = min[1] + dist[1][k] - temp.origin[1];
+		float next_1 = min[1] + dist[0][j] - temp.origin[1], next_2 = min[1] + dist[1][k] - temp.origin[1];
 
 		if (in_1 && in_2 && ((next_1 < (max[1] - min[1])) || (next_2 < (max[1] - min[1]))))
 		{
@@ -1026,7 +1026,7 @@ __global__ void overlap_area_cuda(poly* p, double min_x, double min_y, double ma
 	}
 }
 
-__host__ __device__ double overlap_area(const poly p_1, const poly p_2)
+__host__ __device__ float overlap_area(const poly p_1, const poly p_2)
 {
 	point max_1 = p_1[0].origin, min_1 = p_1[0].origin;
 	for (int i = 1; i < 20; i++)
@@ -1059,8 +1059,8 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 		cudaMalloc((void**)&p_d, sizeof(poly) * 2);
 		cudaMemcpy(p_d, p_h, sizeof(poly) * 2, cudaMemcpyHostToDevice);
 
-		double* output_d = NULL;
-		cudaMalloc((void**)&output_d, sizeof(double) * int(max[0] - min[0]));
+		float* output_d = NULL;
+		cudaMalloc((void**)&output_d, sizeof(float) * int(max[0] - min[0]));
 
 		cudaDeviceProp deviceProp;
 		cudaGetDeviceProperties(&deviceProp, 0);
@@ -1070,10 +1070,10 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 		overlap_area_cuda << < 块, 每块线程 >> > (p_d, min[0], min[1], max[0], max[1], output_d);
 		cudaFree(p_d);
 
-		double* output_h = new double[int(max[0] - min[0])];
-		cudaMemcpy(output_h, output_d, sizeof(double) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
+		float* output_h = new float[int(max[0] - min[0])];
+		cudaMemcpy(output_h, output_d, sizeof(float) * int(max[0] - min[0]), cudaMemcpyDeviceToHost);
 		cudaFree(output_d);
-		double output = 0;
+		float output = 0;
 		for (int i = 0; i<int(max[0] - min[0]); i++)
 		{
 			output += output_h[i];
@@ -1084,7 +1084,7 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 
 #endif
 
-	double output = 0;
+	float output = 0;
 	for (int i = min[0]; i < max[0]; i++)
 	{
 		ray temp;
@@ -1093,10 +1093,10 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 
 		
 		bool in_1 = false, in_2 = false;
-		double dist[2][20];
+		float dist[2][20];
 		for (int j = 0; j < 20; j++)
 		{
-			double t_1, t_2;
+			float t_1, t_2;
 			cross(temp, p_1[j], t_1, t_2);
 			dist[0][j] = t_1;
 			if (t_1 != DBL_MAX)
@@ -1116,7 +1116,7 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 		int j = 0, k = 0;
 		while ((j < 20) && (k < 20))
 		{
-			double next_1 = min[1] + dist[0][j] - temp.origin[1], next_2 = min[1] + dist[1][k] - temp.origin[1];
+			float next_1 = min[1] + dist[0][j] - temp.origin[1], next_2 = min[1] + dist[1][k] - temp.origin[1];
 
 			if (in_1 && in_2 && ((next_1 < (max[1] - min[1])) || (next_2 < (max[1] - min[1]))))
 			{
@@ -1148,21 +1148,21 @@ __host__ __device__ double overlap_area(const poly p_1, const poly p_2)
 	return output;
 }
 
-__host__ __device__ double dist(const poly p_1, const poly p_2)
+__host__ __device__ float dist(const poly p_1, const poly p_2)
 {
 	return length(p_1.fast_center(), p_2.fast_center());
 }
 
-__host__ __device__ double dist(const poly p, const line l)
+__host__ __device__ float dist(const poly p, const line l)
 {
-	double d = DBL_MAX;
+	float d = DBL_MAX;
 	for (int i = 0; i < 20; i++)
 	{
 		if (is_cross(p[i], l))
 		{
 			return 0;
 		}
-		double t = l.point_dist(p[i].origin);
+		float t = l.point_dist(p[i].origin);
 		if (t < d)
 		{
 			d = t;
@@ -1171,16 +1171,16 @@ __host__ __device__ double dist(const poly p, const line l)
 	return d;
 }
 
-__host__ __device__ double dist(const poly p, const ray l)
+__host__ __device__ float dist(const poly p, const ray l)
 {
-	double d = DBL_MAX;
+	float d = DBL_MAX;
 	for (int i = 0; i < 20; i++)
 	{
 		if (is_cross(p[i], l))
 		{
 			return 0;
 		}
-		double t = l.point_dist(p[i].origin);
+		float t = l.point_dist(p[i].origin);
 		if (t < d)
 		{
 			d = t;
@@ -1189,16 +1189,16 @@ __host__ __device__ double dist(const poly p, const ray l)
 	return d;
 }
 
-__host__ __device__ double dist(const poly p, const seg l)
+__host__ __device__ float dist(const poly p, const seg l)
 {
-	double d = DBL_MAX;
+	float d = DBL_MAX;
 	for (int i = 0; i < 20; i++)
 	{
 		if (is_cross(p[i], l))
 		{
 			return 0;
 		}
-		double t = l.point_dist(p[i].origin);
+		float t = l.point_dist(p[i].origin);
 		if (t < d)
 		{
 			d = t;

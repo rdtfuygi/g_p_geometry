@@ -16,63 +16,63 @@
 #include <opencv.hpp>
 
 
-DLL __host__ __device__ double deg2rad(double rad);
-DLL __host__ __device__ double rad2deg(double deg);
+DLL __host__ __device__ float deg2rad(float rad);
+DLL __host__ __device__ float rad2deg(float deg);
 
 
 class DLL point
 {
 public:
-	double locat[2];
+	float locat[2];
 	__host__ __device__ point();
-	__host__ __device__ point(double x, double y);
-	__host__ __device__ point(double 位置[2]);
-	__host__ __device__ double& operator[](int i);
-	__host__ __device__ double operator[](int i) const;
-	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+	__host__ __device__ point(float x, float y);
+	__host__ __device__ point(float 位置[2]);
+	__host__ __device__ float& operator[](int i);
+	__host__ __device__ float operator[](int i) const;
+	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 };
 
-DLL __host__ __device__ double length(double 点_1_x, double 点_1_y, double 点_2_x, double 点_2_y);
-DLL __host__ __device__ double length(point 点_1, point 点_2);
+DLL __host__ __device__ float length(float 点_1_x, float 点_1_y, float 点_2_x, float 点_2_y);
+DLL __host__ __device__ float length(point 点_1, point 点_2);
 
-DLL __host__ __device__ point rotate(const point 原点, const point 点_2, double 角度, bool rad = false);
+DLL __host__ __device__ point rotate(const point 原点, const point 点_2, float 角度, bool rad = false);
 
 class DLL vector :public point
 {
 public:
 	__host__ __device__ vector();
-	__host__ __device__ vector(double x, double y);
+	__host__ __device__ vector(float x, float y);
 	__host__ __device__ vector(point 点);
-	__host__ __device__ vector(double 方向[2], double 长度);
-	__host__ __device__ vector(double 角度, bool rad = false, double 长度 = 1);
+	__host__ __device__ vector(float 方向[2], float 长度);
+	__host__ __device__ vector(float 角度, bool rad = false, float 长度 = 1);
 	__host__ __device__ vector& operator += (vector 向量);
 	__host__ __device__ vector& operator -= (vector 向量);
-	__host__ __device__ vector& operator *= (double 数);
-	__host__ __device__ vector& operator /= (double 数);
+	__host__ __device__ vector& operator *= (float 数);
+	__host__ __device__ vector& operator /= (float 数);
 	__host__ __device__ vector unitize() const;
-	__host__ __device__ double length() const;
-	__host__ __device__ vector rotate(double 角度, bool rad = false) const;
+	__host__ __device__ float length() const;
+	__host__ __device__ vector rotate(float 角度, bool rad = false) const;
 
-	__host__ __device__ double angle_get(bool rad = false) const;
+	__host__ __device__ float angle_get(bool rad = false) const;
 
-	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 };
 
-DLL __host__ __device__ double inc_angle_cos(vector 向量_1, vector 向量_2);
-DLL __host__ __device__ double inc_angle_sin(vector 向量_1, vector 向量_2);
+DLL __host__ __device__ float inc_angle_cos(vector 向量_1, vector 向量_2);
+DLL __host__ __device__ float inc_angle_sin(vector 向量_1, vector 向量_2);
 
 DLL __host__ __device__ vector operator - (vector 向量);
 
 DLL __host__ __device__ vector operator + (vector 向量_1, vector 向量_2);
 DLL __host__ __device__ vector operator - (vector 向量_1, vector 向量_2);
-DLL __host__ __device__ vector operator * (vector 向量, double 数);
-DLL __host__ __device__ vector operator * (double 数, vector 向量);
-DLL __host__ __device__ vector operator / (vector 向量, double 数);
+DLL __host__ __device__ vector operator * (vector 向量, float 数);
+DLL __host__ __device__ vector operator * (float 数, vector 向量);
+DLL __host__ __device__ vector operator / (vector 向量, float 数);
 
-DLL __host__ __device__ double operator * (vector 向量_1, vector 向量_2);
-DLL __host__ __device__ double operator ^ (vector 向量_1, vector 向量_2);
+DLL __host__ __device__ float operator * (vector 向量_1, vector 向量_2);
+DLL __host__ __device__ float operator ^ (vector 向量_1, vector 向量_2);
 
-DLL __host__ __device__ double length(vector 向量);
+DLL __host__ __device__ float length(vector 向量);
 
 
 
@@ -83,17 +83,17 @@ public:
 	vector dir;
 	__host__ __device__ line();
 	__host__ __device__ line(point 点, vector 向量);
-	__host__ __device__ line(point 点, double 角度, bool rad = false);
-	__host__ __device__ line(double 点_1_x, double 点_1_y, double 点_2_x, double 点_2_y);
+	__host__ __device__ line(point 点, float 角度, bool rad = false);
+	__host__ __device__ line(float 点_1_x, float 点_1_y, float 点_2_x, float 点_2_y);
 	__host__ __device__ line(point 点_1, point 点_2);
-	__host__ __device__ line(double k, double b);
-	__host__ __device__ point point_get(double t) const;
-	__host__ __device__ double angle_get(bool rad = false) const;
-	__host__ __device__ line rotate(const point 点, double 角度, bool rad = false) const;
-	__host__ __device__ double point_dist(const point 点) const;
+	__host__ __device__ line(float k, float b);
+	__host__ __device__ point point_get(float t) const;
+	__host__ __device__ float angle_get(bool rad = false) const;
+	__host__ __device__ line rotate(const point 点, float 角度, bool rad = false) const;
+	__host__ __device__ float point_dist(const point 点) const;
 	__host__ __device__ void norm();
 
-	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 };
 
 class DLL  ray :public line
@@ -101,43 +101,43 @@ class DLL  ray :public line
 public:
 	__host__ __device__ ray();
 	__host__ __device__ ray(point 点, vector 向量);
-	__host__ __device__ ray(point 点, double 角度, bool rad = false);
-	__host__ __device__ ray(double 点_1_x, double 点_1_y, double 点_2_x, double 点_2_y);
+	__host__ __device__ ray(point 点, float 角度, bool rad = false);
+	__host__ __device__ ray(float 点_1_x, float 点_1_y, float 点_2_x, float 点_2_y);
 	__host__ __device__ ray(point 点_1, point 点_2);
-	__host__ __device__ ray rotate(const point 点, double 角度, bool rad = false) const;
-	__host__ __device__ double point_dist(const point 点) const;
+	__host__ __device__ ray rotate(const point 点, float 角度, bool rad = false) const;
+	__host__ __device__ float point_dist(const point 点) const;
 
-	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 };
 
 class DLL  seg :public ray
 {
 public:
-	double dist;
+	float dist;
 	__host__ __device__ seg();
-	__host__ __device__ seg(point 点, vector 向量, double 长度);
-	__host__ __device__ seg(point 点, double 方向, double 长度, bool rad = false);
-	__host__ __device__ seg(double 点_1_x, double 点_1_y, double 点_2_x, double 点_2_y);
+	__host__ __device__ seg(point 点, vector 向量, float 长度);
+	__host__ __device__ seg(point 点, float 方向, float 长度, bool rad = false);
+	__host__ __device__ seg(float 点_1_x, float 点_1_y, float 点_2_x, float 点_2_y);
 	__host__ __device__ seg(point 点_1, point 点_2);
 	__host__ __device__ point end() const;
-	__host__ __device__ seg rotate(const point 点, double 角度, bool rad = false) const;
-	__host__ __device__ double point_dist(const point 点) const;
+	__host__ __device__ seg rotate(const point 点, float 角度, bool rad = false) const;
+	__host__ __device__ float point_dist(const point 点) const;
 	__host__ __device__ void norm();
 
-	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 };
 
-DLL __host__ __device__ double inc_angle_cos(const line l_1, const line l_2);
-DLL __host__ __device__ double inc_angle_sin(const line l_1, const line l_2);
-DLL __host__ __device__ void cross(const line l_1, const line l_2, double& t_1, double& t_2);
-DLL __host__ __device__ void cross(const line l_1, const ray l_2, double& t_1, double& t_2);
-DLL __host__ __device__ void cross(const line l_1, const seg l_2, double& t_1, double& t_2);
-DLL __host__ __device__ void cross(const ray l_1, const line l_2, double& t_1, double& t_2);
-DLL __host__ __device__ void cross(const ray l_1, const ray l_2, double& t_1, double& t_2);
-DLL __host__ __device__ void cross(const ray l_1, const seg l_2, double& t_1, double& t_2);
-DLL __host__ __device__ void cross(const seg l_1, const line l_2, double& t_1, double& t_2);
-DLL __host__ __device__ void cross(const seg l_1, const ray l_2, double& t_1, double& t_2);
-DLL __host__ __device__ void cross(const seg l_1, const seg l_2, double& t_1, double& t_2);
+DLL __host__ __device__ float inc_angle_cos(const line l_1, const line l_2);
+DLL __host__ __device__ float inc_angle_sin(const line l_1, const line l_2);
+DLL __host__ __device__ void cross(const line l_1, const line l_2, float& t_1, float& t_2);
+DLL __host__ __device__ void cross(const line l_1, const ray l_2, float& t_1, float& t_2);
+DLL __host__ __device__ void cross(const line l_1, const seg l_2, float& t_1, float& t_2);
+DLL __host__ __device__ void cross(const ray l_1, const line l_2, float& t_1, float& t_2);
+DLL __host__ __device__ void cross(const ray l_1, const ray l_2, float& t_1, float& t_2);
+DLL __host__ __device__ void cross(const ray l_1, const seg l_2, float& t_1, float& t_2);
+DLL __host__ __device__ void cross(const seg l_1, const line l_2, float& t_1, float& t_2);
+DLL __host__ __device__ void cross(const seg l_1, const ray l_2, float& t_1, float& t_2);
+DLL __host__ __device__ void cross(const seg l_1, const seg l_2, float& t_1, float& t_2);
 DLL __host__ __device__ point cross(const line l_1, const line l_2);
 DLL __host__ __device__ point cross(const line l_1, const ray l_2);
 DLL __host__ __device__ point cross(const line l_1, const seg l_2);
@@ -175,9 +175,9 @@ public:
 
 	__host__ __device__ bool is_cross(const seg l) const;
 
-	__host__ __device__ double area() const;
+	__host__ __device__ float area() const;
 
-	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 };
 
 
@@ -191,8 +191,8 @@ protected:
 	mutable bool fast_center_change;
 
 	mutable bool legal_;
-	mutable double area_;
-	mutable double dir_area_;
+	mutable float area_;
+	mutable float dir_area_;
 	mutable point center_;
 	mutable point fast_center_;
 
@@ -224,17 +224,17 @@ public:
 
 	__host__ __device__ bool full_overlap(const poly other) const;
 
-	__host__ __device__ double overlap_area(const poly other) const;
+	__host__ __device__ float overlap_area(const poly other) const;
 
 	__host__ __device__ seg& operator[](int i);
 
 	__host__ __device__ seg operator[](int i) const;
 
-	__host__ __device__ double dir_area() const;
+	__host__ __device__ float dir_area() const;
 
-	__host__ __device__ double area() const;
+	__host__ __device__ float area() const;
 
-	void print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
 
 	__host__ __device__ point center() const;
 
@@ -242,19 +242,19 @@ public:
 
 	__host__ __device__ vector move2center();
 
-	__host__ __device__ void simple(double 角度 = 30, bool rad = false);
+	__host__ __device__ void simple(float 角度 = 30, bool rad = false);
 };
 
 DLL __host__ __device__ bool is_overlap(const poly p_1, const poly p_2);
 
-DLL __host__ __device__ double overlap_area(const poly p_1, const poly p_2);
+DLL __host__ __device__ float overlap_area(const poly p_1, const poly p_2);
 
-DLL __host__ __device__ double dist(const poly p_1, const poly p_2);
+DLL __host__ __device__ float dist(const poly p_1, const poly p_2);
 
-DLL __host__ __device__ double dist(const poly p, const line l);
+DLL __host__ __device__ float dist(const poly p, const line l);
 
-DLL __host__ __device__ double dist(const poly p, const ray l);
+DLL __host__ __device__ float dist(const poly p, const ray l);
 
-DLL __host__ __device__ double dist(const poly p, const seg l);
+DLL __host__ __device__ float dist(const poly p, const seg l);
 
 

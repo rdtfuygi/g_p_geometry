@@ -56,12 +56,12 @@ __host__ __device__ bool tirangle::is_cross(const seg l) const
 	return (::is_cross(segs[0], l)) || (::is_cross(segs[1], l)) || (::is_cross(segs[2], l));
 }
 
-__host__ __device__ double tirangle::area() const
+__host__ __device__ float tirangle::area() const
 {
 	return abs((vector(segs[1].origin) - vector(segs[0].origin)) ^ (vector(segs[2].origin) - vector(segs[0].origin))) / 2;
 }
 
-void tirangle::print(cv::InputOutputArray Í¼Ïñ, double ±ÈÀı, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
+void tirangle::print(cv::InputOutputArray Í¼Ïñ, float ±ÈÀı, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
 {
 	seg(segs[0].origin, segs[1].origin).print(Í¼Ïñ, ±ÈÀı, ÑÕÉ«, ´ÖÏ¸);
 	seg(segs[1].origin, segs[2].origin).print(Í¼Ïñ, ±ÈÀı, ÑÕÉ«, ´ÖÏ¸);

@@ -6,29 +6,29 @@ __host__ __device__ point::point()
 	locat[1] = 0;
 }
 
-__host__ __device__ point::point(double x, double y)
+__host__ __device__ point::point(float x, float y)
 {
 	locat[0] = x;
 	locat[1] = y;
 }
 
-__host__ __device__ point::point(double 位置[2])
+__host__ __device__ point::point(float 位置[2])
 {
 	locat[0] = 位置[0];
 	locat[1] = 位置[1];
 }
 
-__host__ __device__ double& point::operator[](int i)
+__host__ __device__ float& point::operator[](int i)
 {
 	return locat[i & 1];
 }
 
-__host__ __device__ double point::operator[](int i) const
+__host__ __device__ float point::operator[](int i) const
 {
 	return locat[i & 1];
 }
 
-void point::print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细) const
+void point::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细) const
 {
 	int 高 = 图像.rows(), 宽 = 图像.cols();
 	int 原点_x = 宽 / 2, 原点_y = 高 / 2;

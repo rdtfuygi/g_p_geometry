@@ -4,18 +4,18 @@
 
 __host__ __device__ vector::vector() :point(1, 0) {}
 
-__host__ __device__ vector::vector(double x, double y) : point(x, y) {}
+__host__ __device__ vector::vector(float x, float y) : point(x, y) {}
 
 __host__ __device__ vector::vector(point µã) : point(µã) {};
 
-__host__ __device__ vector::vector(double ·½Ïò[2], double ³¤¶È)
+__host__ __device__ vector::vector(float ·½Ïò[2], float ³¤¶È)
 {
-	double ±ÈÀı = ³¤¶È / ::length({ 0,0 }, ·½Ïò);
+	float ±ÈÀı = ³¤¶È / ::length({ 0,0 }, ·½Ïò);
 	locat[0] = ·½Ïò[0] * ±ÈÀı;
 	locat[1] = ·½Ïò[1] * ±ÈÀı;
 }
 
-__host__ __device__ vector::vector(double ½Ç¶È, bool rad, double ³¤¶È)
+__host__ __device__ vector::vector(float ½Ç¶È, bool rad, float ³¤¶È)
 {
 	if (!rad)
 	{
@@ -39,14 +39,14 @@ __host__ __device__ vector& vector::operator-=(vector ÏòÁ¿)
 	return *this;
 }
 
-__host__ __device__ vector& vector::operator*=(double Êı)
+__host__ __device__ vector& vector::operator*=(float Êı)
 {
 	locat[0] *= Êı;
 	locat[1] *= Êı;
 	return *this;
 }
 
-__host__ __device__ vector& vector::operator/=(double Êı)
+__host__ __device__ vector& vector::operator/=(float Êı)
 {
 	locat[0] /= Êı;
 	locat[1] /= Êı;
@@ -55,7 +55,7 @@ __host__ __device__ vector& vector::operator/=(double Êı)
 
 __host__ __device__ vector vector::unitize() const
 {
-	double ³¤¶È = length();
+	float ³¤¶È = length();
 	if (³¤¶È < 1e-16)
 	{
 		return vector(M_SQRT1_2, M_SQRT1_2);
@@ -63,19 +63,19 @@ __host__ __device__ vector vector::unitize() const
 	return vector(*this / ³¤¶È);
 }
 
-__host__ __device__ double vector::length() const
+__host__ __device__ float vector::length() const
 {
 	return ::length(*this);
 }
 
-__host__ __device__ vector vector::rotate(double ½Ç¶È, bool rad) const
+__host__ __device__ vector vector::rotate(float ½Ç¶È, bool rad) const
 {
 	return vector(::rotate({ 0,0 }, point(*this), ½Ç¶È, rad));
 }
 
-__host__ __device__ double vector::angle_get(bool rad) const
+__host__ __device__ float vector::angle_get(bool rad) const
 {
-	double ½Ç¶È = atan(locat[1] / locat[0]) + (locat[0] > 0 ? 0 : M_PI);
+	float ½Ç¶È = atan(locat[1] / locat[0]) + (locat[0] > 0 ? 0 : M_PI);
 	if (!rad)
 	{
 		½Ç¶È = rad2deg(½Ç¶È);
@@ -83,7 +83,7 @@ __host__ __device__ double vector::angle_get(bool rad) const
 	return ½Ç¶È;
 }
 
-void vector::print(cv::InputOutputArray Í¼Ïñ, double ±ÈÀı, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
+void vector::print(cv::InputOutputArray Í¼Ïñ, float ±ÈÀı, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
 {
 	int ¸ß = Í¼Ïñ.rows(), ¿í = Í¼Ïñ.cols();
 	int Ô­µã_x = ¿í / 2, Ô­µã_y = ¸ß / 2;
@@ -95,12 +95,12 @@ void vector::print(cv::InputOutputArray Í¼Ïñ, double ±ÈÀı, const cv::Scalar& ÑÕÉ
 	cv::line(Í¼Ïñ, µã_1, µã_2, ÑÕÉ«, ´ÖÏ¸);
 }
 
-__host__ __device__ double inc_angle_cos(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
+__host__ __device__ float inc_angle_cos(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
 {	
 	return ÏòÁ¿_1.unitize() * ÏòÁ¿_2.unitize();
 }
 
-__host__ __device__ double inc_angle_sin(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
+__host__ __device__ float inc_angle_sin(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
 {
 	return ÏòÁ¿_1.unitize() ^ ÏòÁ¿_2.unitize();
 }
@@ -120,35 +120,35 @@ __host__ __device__ vector operator-(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
 	return vector(ÏòÁ¿_1[0] - ÏòÁ¿_2[0], ÏòÁ¿_1[1] - ÏòÁ¿_2[1]);
 }
 
-__host__ __device__ vector operator*(vector ÏòÁ¿, double Êı)
+__host__ __device__ vector operator*(vector ÏòÁ¿, float Êı)
 {
 	return vector(ÏòÁ¿[0] * Êı, ÏòÁ¿[1] * Êı);
 }
 
-__host__ __device__ vector operator*(double Êı, vector ÏòÁ¿)
+__host__ __device__ vector operator*(float Êı, vector ÏòÁ¿)
 {
 	return vector(ÏòÁ¿[0] * Êı, ÏòÁ¿[1] * Êı);
 }
 
-__host__ __device__ vector operator/(vector ÏòÁ¿, double Êı)
+__host__ __device__ vector operator/(vector ÏòÁ¿, float Êı)
 {
 	return vector(ÏòÁ¿[0] / Êı, ÏòÁ¿[1] / Êı);
 }
 
 
-__host__ __device__ double length(vector ÏòÁ¿)
+__host__ __device__ float length(vector ÏòÁ¿)
 {
 	return length({ 0,0 }, ÏòÁ¿);
 }
 
 
 
-__host__ __device__ double operator*(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
+__host__ __device__ float operator*(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
 {
 	return ÏòÁ¿_1[0] * ÏòÁ¿_2[0] + ÏòÁ¿_1[1] * ÏòÁ¿_2[1];
 }
 
-__host__ __device__ double operator^(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
+__host__ __device__ float operator^(vector ÏòÁ¿_1, vector ÏòÁ¿_2)
 {
 	return (ÏòÁ¿_1[0] * ÏòÁ¿_2[1]) - (ÏòÁ¿_1[1] * ÏòÁ¿_2[0]);
 }

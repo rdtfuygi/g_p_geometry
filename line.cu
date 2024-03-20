@@ -4,7 +4,7 @@ __host__ __device__ line::line() :origin(), dir() {}
 
 __host__ __device__ line::line(point 点, vector 向量) : origin(点), dir(向量.unitize()) {}
 
-__host__ __device__ line::line(point 点, double 角度, bool rad) : origin(点)
+__host__ __device__ line::line(point 点, float 角度, bool rad) : origin(点)
 {
 	if (!rad)
 	{
@@ -14,46 +14,46 @@ __host__ __device__ line::line(point 点, double 角度, bool rad) : origin(点)
 	dir[1] = sin(角度);
 }
 
-__host__ __device__ line::line(double 点_1_x, double 点_1_y, double 点_2_x, double 点_2_y) :origin(点_1_x, 点_1_y), dir((vector(点_2_x, 点_2_y) - vector(点_1_x, 点_1_y)).unitize()) {}
+__host__ __device__ line::line(float 点_1_x, float 点_1_y, float 点_2_x, float 点_2_y) :origin(点_1_x, 点_1_y), dir((vector(点_2_x, 点_2_y) - vector(点_1_x, 点_1_y)).unitize()) {}
 
 __host__ __device__ line::line(point 点_1, point 点_2) :origin(点_1), dir((vector(点_2) - vector(点_1)).unitize()) {}
 
-__host__ __device__ line::line(double k, double b) :origin(0, b), dir(vector(1, k + b).unitize()) {}
+__host__ __device__ line::line(float k, float b) :origin(0, b), dir(vector(1, k + b).unitize()) {}
 
-__host__ __device__ point line::point_get(double t) const
+__host__ __device__ point line::point_get(float t) const
 {
 	return point(vector(origin) + (dir * t));
 }
 
-__host__ __device__ double line::angle_get(bool rad) const
+__host__ __device__ float line::angle_get(bool rad) const
 {
 	return dir.angle_get(rad);
 }
 
-__host__ __device__ line line::rotate(const point 点, double 角度, bool rad) const
+__host__ __device__ line line::rotate(const point 点, float 角度, bool rad) const
 {
 	return line(::rotate(点, origin, 角度, rad), dir.rotate(角度, rad));
 }
 
-__host__ __device__ double line::point_dist(const point 点) const
+__host__ __device__ float line::point_dist(const point 点) const
 {
 	line temp;
 	temp.origin = 点;
 	temp.dir[0] = dir[1];
 	temp.dir[1] = -dir[0];
 
-	double t_1, t_2;
+	float t_1, t_2;
 	cross(*this, temp, t_1, t_2);
 	return abs(t_2);
 }
 
 __host__ __device__ void line::norm()
 {
-	double l = length(dir);
+	float l = length(dir);
 	dir /= l;
 }
 
-void line::print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色, int 粗细) const
+void line::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细) const
 {
 	int 高 = 图像.rows(), 宽 = 图像.cols();
 	int 原点_x = 宽 / 2, 原点_y = 高 / 2;
@@ -66,27 +66,27 @@ void line::print(cv::InputOutputArray 图像, double 比例, const cv::Scalar& 颜色,
 }
 
 
-__host__ __device__ double inc_angle_cos(const line l_1, const line l_2)
+__host__ __device__ float inc_angle_cos(const line l_1, const line l_2)
 {
 	return l_1.dir * l_2.dir;
 }
 
-DLL __host__ __device__ double inc_angle_sin(const line l_1, const line l_2)
+DLL __host__ __device__ float inc_angle_sin(const line l_1, const line l_2)
 {
 	return l_1.dir ^ l_2.dir;
 }
 
-__host__ __device__ void cross(const line l_1, const line l_2, double& t_1, double& t_2)
+__host__ __device__ void cross(const line l_1, const line l_2, float& t_1, float& t_2)
 {
-	double 矩阵[2][3] =
+	float 矩阵[2][3] =
 	{
 		{l_1.dir[0],-l_2.dir[0],-l_1.origin[0] + l_2.origin[0]},
 		{l_1.dir[1],-l_2.dir[1],-l_1.origin[1] + l_2.origin[1]}
 	};
 	if (矩阵[0][0] != 0)
 	{
-		double a00 = 矩阵[0][0];
-		double a10 = 矩阵[1][0];
+		float a00 = 矩阵[0][0];
+		float a10 = 矩阵[1][0];
 		for (int i = 0; i < 3; i++)
 		{
 			矩阵[0][i] /= a00;
@@ -100,8 +100,8 @@ __host__ __device__ void cross(const line l_1, const line l_2, double& t_1, doub
 			return;
 		}
 
-		double a01 = 矩阵[0][1];
-		double a11 = 矩阵[1][1];
+		float a01 = 矩阵[0][1];
+		float a11 = 矩阵[1][1];
 		for (int i = 0; i < 3; i++)
 		{
 			矩阵[1][i] /= a11;
@@ -113,8 +113,8 @@ __host__ __device__ void cross(const line l_1, const line l_2, double& t_1, doub
 	}
 	else if (矩阵[1][0] != 0)
 	{
-		double a10 = 矩阵[1][0];
-		double a00 = 矩阵[0][0];
+		float a10 = 矩阵[1][0];
+		float a00 = 矩阵[0][0];
 		for (int i = 0; i < 3; i++)
 		{
 			矩阵[1][i] /= a10;
@@ -128,8 +128,8 @@ __host__ __device__ void cross(const line l_1, const line l_2, double& t_1, doub
 			return;
 		}
 
-		double a11 = 矩阵[1][1];
-		double a01 = 矩阵[0][1];
+		float a11 = 矩阵[1][1];
+		float a01 = 矩阵[0][1];
 		for (int i = 0; i < 3; i++)
 		{
 			矩阵[0][i] /= a01;
@@ -147,7 +147,7 @@ __host__ __device__ void cross(const line l_1, const line l_2, double& t_1, doub
 	}
 }
 
-__host__ __device__ void cross(const line l_1, const ray l_2, double& t_1, double& t_2)
+__host__ __device__ void cross(const line l_1, const ray l_2, float& t_1, float& t_2)
 {
 	cross(line(l_1), line(l_2), t_1, t_2);
 	if (0 > t_2)
@@ -157,7 +157,7 @@ __host__ __device__ void cross(const line l_1, const ray l_2, double& t_1, doubl
 	}
 }
 
-__host__ __device__ void cross(const line l_1, const seg l_2, double& t_1, double& t_2)
+__host__ __device__ void cross(const line l_1, const seg l_2, float& t_1, float& t_2)
 {
 	cross(line(l_1), line(l_2), t_1, t_2);
 	if ((0 > t_2) || (t_2 > l_2.dist))
@@ -169,7 +169,7 @@ __host__ __device__ void cross(const line l_1, const seg l_2, double& t_1, doubl
 
 __host__ __device__ point cross(const line l_1, const line l_2)
 {
-	double t_1, t_2;
+	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
 	if (t_1 != DBL_MAX)
 	{
@@ -183,7 +183,7 @@ __host__ __device__ point cross(const line l_1, const line l_2)
 
 __host__ __device__ point cross(const line l_1, const ray l_2)
 {
-	double t_1, t_2;
+	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
 	if (t_1 != DBL_MAX)
 	{
@@ -197,7 +197,7 @@ __host__ __device__ point cross(const line l_1, const ray l_2)
 
 __host__ __device__ point cross(const line l_1, const seg l_2)
 {
-	double t_1, t_2;
+	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
 	if (t_1 != DBL_MAX)
 	{
@@ -211,7 +211,7 @@ __host__ __device__ point cross(const line l_1, const seg l_2)
 
 __host__ __device__ bool is_cross(const line l_1, const line l_2)
 {	
-	double t_1, t_2;
+	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
 	if (t_1 == DBL_MAX)
 	{
@@ -222,7 +222,7 @@ __host__ __device__ bool is_cross(const line l_1, const line l_2)
 
 __host__ __device__ bool is_cross(const line l_1, const ray l_2)
 {
-	double t_1, t_2;
+	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
 	if (t_1 == DBL_MAX)
 	{
@@ -233,7 +233,7 @@ __host__ __device__ bool is_cross(const line l_1, const ray l_2)
 
 __host__ __device__ bool is_cross(const line l_1, const seg l_2)
 {
-	double t_1, t_2;
+	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
 	if (t_1 == DBL_MAX)
 	{

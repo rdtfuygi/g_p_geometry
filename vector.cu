@@ -75,7 +75,7 @@ __host__ __device__ vector vector::rotate(float 角度, bool rad) const
 
 __host__ __device__ float vector::angle_get(bool rad) const
 {
-	float 角度 = atan(locat[1] / locat[0]) + (locat[0] > 0 ? 0 : M_PI);
+	float 角度 = atan(locat[1] / locat[0]) + (locat[0] > 0 ? 0 : float(M_PI));
 	if (!rad)
 	{
 		角度 = rad2deg(角度);

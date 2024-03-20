@@ -58,7 +58,7 @@ __host__ __device__ vector vector::unitize() const
 	float 长度 = length();
 	if (长度 < 1e-16)
 	{
-		return vector(M_SQRT1_2, M_SQRT1_2);
+		return vector(float(M_SQRT1_2), float(M_SQRT1_2));
 	}
 	return vector(*this / 长度);
 }

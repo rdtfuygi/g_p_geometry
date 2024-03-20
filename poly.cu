@@ -182,7 +182,7 @@ __host__ __device__ bool poly::legal() const
 //	char map[10] = { 0,1,2,3,4,5,6,7,8,9 };
 //	for (int i = 0; i < 10; i++)
 //	{
-//		if ((last[2 * i + 1] != DBL_MAX) && (last[2 * i] != DBL_MAX))
+//		if ((last[2 * i + 1] != FLT_MAX) && (last[2 * i] != FLT_MAX))
 //		{
 //			areas[i] = last[2 * i + 1] - last[2 * i];
 //		}
@@ -229,7 +229,7 @@ __host__ __device__ bool poly::legal() const
 //		int i = 0, j = 0;
 //		while ((i < 10) && (j < 10))
 //		{
-//			if ((last[2 * i] == DBL_MAX) || (last[2 * i + 1] == DBL_MAX) || (dist[2 * j] == DBL_MAX) || (dist[2 * j + 1] == DBL_MAX))
+//			if ((last[2 * i] == FLT_MAX) || (last[2 * i + 1] == FLT_MAX) || (dist[2 * j] == FLT_MAX) || (dist[2 * j + 1] == FLT_MAX))
 //			{
 //				break;
 //			}
@@ -348,7 +348,7 @@ __host__ __device__ bool poly::point_in(point 点) const
 
 	ray temp;
 	temp.origin = 点;
-	temp.dir = vector(0.0, 1.0);
+	temp.dir = vector(0.0f, 1.0f);
 	int k = 0;
 
 	for (int i = 0; i < 20 ; i++)
@@ -482,7 +482,7 @@ __global__ void poly_area(seg* segs, float min_x, float min_y, float max_x, floa
 
 	seg temp;
 	temp.origin = point(x, min[1]);
-	temp.dir = vector(0.0, 1.0);
+	temp.dir = vector(0.0f, 1.0f);
 	temp.dist = max[1] - min[1];
 
 	float dist[20];
@@ -516,7 +516,7 @@ __global__ void poly_area(seg* segs, float min_x, float min_y, float max_x, floa
 	output[idx] = 0;
 	for (int i = 0; i < 10; i++)
 	{
-		if ((dist[2 * i + 1] == DBL_MAX) || (dist[2 * i] == DBL_MAX))
+		if ((dist[2 * i + 1] == FLT_MAX) || (dist[2 * i] == FLT_MAX))
 		{
 			break;
 		}
@@ -581,7 +581,7 @@ __host__ __device__ float poly::area() const
 	{
 		seg temp;
 		temp.origin = point(x, min[1]);
-		temp.dir = vector(0.0, 1.0);
+		temp.dir = vector(0.0f, 1.0f);
 		temp.dist = max[1] - min[1];
 
 		float dist[20];
@@ -614,7 +614,7 @@ __host__ __device__ float poly::area() const
 
 		for (int i = 0; i < 10; i++)
 		{
-			if ((dist[2 * i + 1] == DBL_MAX) || (dist[2 * i] == DBL_MAX))
+			if ((dist[2 * i + 1] == FLT_MAX) || (dist[2 * i] == FLT_MAX))
 			{
 				break;
 			}
@@ -649,7 +649,7 @@ __global__ void poly_center(seg* segs, float min_x, float min_y, float max_x, fl
 
 	seg temp;
 	temp.origin = point(x, min[1]);
-	temp.dir = vector(0.0, 1.0);
+	temp.dir = vector(0.0f, 1.0f);
 	temp.dist = max[1] - min[1];
 
 	float dist[20];
@@ -683,7 +683,7 @@ __global__ void poly_center(seg* segs, float min_x, float min_y, float max_x, fl
 	p_area[idx] = 0, x_[idx] = 0, y_[idx] = 0;
 	for (int i = 0; i < 10; i++)
 	{
-		if ((dist[2 * i + 1] == DBL_MAX) || (dist[2 * i] == DBL_MAX))
+		if ((dist[2 * i + 1] == FLT_MAX) || (dist[2 * i] == FLT_MAX))
 		{
 			break;
 		}
@@ -766,7 +766,7 @@ __host__ __device__ point poly::center() const
 	{
 		seg temp;
 		temp.origin = point(x, min[1]);
-		temp.dir = vector(0.0, 1.0);
+		temp.dir = vector(0.0f, 1.0f);
 		temp.dist = max[1] - min[1];
 
 		float dist[20];
@@ -782,7 +782,7 @@ __host__ __device__ point poly::center() const
 		float d_x = 0;
 		for (int i = 0; i < 10; i++)
 		{
-			if ((dist[2 * i + 1] == DBL_MAX) || (dist[2 * i] == DBL_MAX))
+			if ((dist[2 * i + 1] == FLT_MAX) || (dist[2 * i] == FLT_MAX))
 			{
 				break;
 			}
@@ -832,7 +832,7 @@ vector poly::move2center()
 		segs[i].origin = point(vector(segs[i].origin) - move);
 	}
 
-	return vector(0.0, 0.0) - move;
+	return vector(0.0f, 0.0f) - move;
 }
 
 __host__ __device__ void poly::simple(float 角度, bool rad)
@@ -854,7 +854,7 @@ __host__ __device__ void poly::simple(float 角度, bool rad)
 		{
 			i = j - 1;
 
-			float cos_t = (vector(0.0, 0.0) - segs[i].dir) * segs[j].dir;
+			float cos_t = (vector(0.0f, 0.0f) - segs[i].dir) * segs[j].dir;
 			if ((cos_t < cos_) || (segs[i].dist < 0.0001) || (segs[j].dist < 0.0001))
 			{
 				continue;
@@ -885,7 +885,7 @@ __host__ __device__ void poly::simple(float 角度, bool rad)
 			}
 		}
 
-		float cos_t = (vector(0.0, 0.0) - dir_) * segs[0].dir;
+		float cos_t = (vector(0.0f, 0.0f) - dir_) * segs[0].dir;
 		if (cos_t < cos_)
 		{
 			continue;
@@ -968,7 +968,7 @@ __global__ void overlap_area_cuda(poly* p, float min_x, float min_y, float max_x
 
 	ray temp;
 	temp.origin = point(i, min[1]);
-	temp.dir = vector(0.0, 1.0);
+	temp.dir = vector(0.0f, 1.0f);
 
 
 	bool in_1 = false, in_2 = false;
@@ -978,13 +978,13 @@ __global__ void overlap_area_cuda(poly* p, float min_x, float min_y, float max_x
 		float t_1, t_2;
 		cross(temp, p_1[j], t_1, t_2);
 		dist[0][j] = t_1;
-		if (t_1 != DBL_MAX)
+		if (t_1 != FLT_MAX)
 		{
 			in_1 = !in_1;
 		}
 		cross(temp, p_2[j], t_1, t_2);
 		dist[1][j] = t_1;
-		if (t_1 != DBL_MAX)
+		if (t_1 != FLT_MAX)
 		{
 			in_2 = !in_2;
 		}
@@ -1089,7 +1089,7 @@ __host__ __device__ float overlap_area(const poly p_1, const poly p_2)
 	{
 		ray temp;
 		temp.origin = point(i, min[1]);
-		temp.dir = vector(0.0, 1.0);
+		temp.dir = vector(0.0f, 1.0f);
 
 		
 		bool in_1 = false, in_2 = false;
@@ -1099,13 +1099,13 @@ __host__ __device__ float overlap_area(const poly p_1, const poly p_2)
 			float t_1, t_2;
 			cross(temp, p_1[j], t_1, t_2);
 			dist[0][j] = t_1;
-			if (t_1 != DBL_MAX)
+			if (t_1 != FLT_MAX)
 			{
 				in_1 = !in_1;
 			}
 			cross(temp, p_2[j], t_1, t_2);
 			dist[1][j] = t_1;
-			if (t_1 != DBL_MAX)
+			if (t_1 != FLT_MAX)
 			{
 				in_2 = !in_2;
 			}
@@ -1155,7 +1155,7 @@ __host__ __device__ float dist(const poly p_1, const poly p_2)
 
 __host__ __device__ float dist(const poly p, const line l)
 {
-	float d = DBL_MAX;
+	float d = FLT_MAX;
 	for (int i = 0; i < 20; i++)
 	{
 		if (is_cross(p[i], l))
@@ -1173,7 +1173,7 @@ __host__ __device__ float dist(const poly p, const line l)
 
 __host__ __device__ float dist(const poly p, const ray l)
 {
-	float d = DBL_MAX;
+	float d = FLT_MAX;
 	for (int i = 0; i < 20; i++)
 	{
 		if (is_cross(p[i], l))
@@ -1191,7 +1191,7 @@ __host__ __device__ float dist(const poly p, const ray l)
 
 __host__ __device__ float dist(const poly p, const seg l)
 {
-	float d = DBL_MAX;
+	float d = FLT_MAX;
 	for (int i = 0; i < 20; i++)
 	{
 		if (is_cross(p[i], l))

@@ -95,8 +95,8 @@ __host__ __device__ void cross(const line l_1, const line l_2, float& t_1, float
 
 		if (¾ØÕó[1][1] == 0)
 		{
-			t_1 = DBL_MAX;
-			t_2 = DBL_MAX;
+			t_1 = FLT_MAX;
+			t_2 = FLT_MAX;
 			return;
 		}
 
@@ -123,8 +123,8 @@ __host__ __device__ void cross(const line l_1, const line l_2, float& t_1, float
 
 		if (¾ØÕó[0][1] == 0)
 		{
-			t_1 = DBL_MAX;
-			t_2 = DBL_MAX;
+			t_1 = FLT_MAX;
+			t_2 = FLT_MAX;
 			return;
 		}
 
@@ -142,8 +142,8 @@ __host__ __device__ void cross(const line l_1, const line l_2, float& t_1, float
 	}
 	else
 	{
-		t_1 = DBL_MAX;
-		t_2 = DBL_MAX;
+		t_1 = FLT_MAX;
+		t_2 = FLT_MAX;
 	}
 }
 
@@ -152,8 +152,8 @@ __host__ __device__ void cross(const line l_1, const ray l_2, float& t_1, float&
 	cross(line(l_1), line(l_2), t_1, t_2);
 	if (0 > t_2)
 	{
-		t_1 = DBL_MAX;
-		t_2 = DBL_MAX;
+		t_1 = FLT_MAX;
+		t_2 = FLT_MAX;
 	}
 }
 
@@ -162,8 +162,8 @@ __host__ __device__ void cross(const line l_1, const seg l_2, float& t_1, float&
 	cross(line(l_1), line(l_2), t_1, t_2);
 	if ((0 > t_2) || (t_2 > l_2.dist))
 	{
-		t_1 = DBL_MAX;
-		t_2 = DBL_MAX;
+		t_1 = FLT_MAX;
+		t_2 = FLT_MAX;
 	}
 }
 
@@ -171,13 +171,13 @@ __host__ __device__ point cross(const line l_1, const line l_2)
 {
 	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if (t_1 != DBL_MAX)
+	if (t_1 != FLT_MAX)
 	{
 		return l_1.point_get(t_1);
 	}
 	else
 	{
-		return point(DBL_MAX, DBL_MAX);
+		return point(FLT_MAX, FLT_MAX);
 	}
 }
 
@@ -185,13 +185,13 @@ __host__ __device__ point cross(const line l_1, const ray l_2)
 {
 	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if (t_1 != DBL_MAX)
+	if (t_1 != FLT_MAX)
 	{
 		return l_1.point_get(t_1);
 	}
 	else
 	{
-		return point(DBL_MAX, DBL_MAX);
+		return point(FLT_MAX, FLT_MAX);
 	}
 }
 
@@ -199,13 +199,13 @@ __host__ __device__ point cross(const line l_1, const seg l_2)
 {
 	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if (t_1 != DBL_MAX)
+	if (t_1 != FLT_MAX)
 	{
 		return l_1.point_get(t_1);
 	}
 	else
 	{
-		return point(DBL_MAX, DBL_MAX);
+		return point(FLT_MAX, FLT_MAX);
 	}
 }
 
@@ -213,7 +213,7 @@ __host__ __device__ bool is_cross(const line l_1, const line l_2)
 {	
 	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if (t_1 == DBL_MAX)
+	if (t_1 == FLT_MAX)
 	{
 		return false;
 	}
@@ -224,7 +224,7 @@ __host__ __device__ bool is_cross(const line l_1, const ray l_2)
 {
 	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if (t_1 == DBL_MAX)
+	if (t_1 == FLT_MAX)
 	{
 		return false;
 	}
@@ -235,7 +235,7 @@ __host__ __device__ bool is_cross(const line l_1, const seg l_2)
 {
 	float t_1, t_2;
 	cross(l_1, l_2, t_1, t_2);
-	if (t_1 == DBL_MAX)
+	if (t_1 == FLT_MAX)
 	{
 		return false;
 	}

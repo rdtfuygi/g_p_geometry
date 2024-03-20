@@ -8,9 +8,9 @@ tirangle::tirangle()
 	segs[0].origin = point(0.0, 0.0);
 	segs[1].origin = point(1.0, 0.0);
 	segs[2].origin = point(0.0, 1.0);
-	segs[0].dir = vector(1.0, 0.0);
-	segs[0].dir = vector(-M_SQRT1_2, M_SQRT1_2);
-	segs[0].dir = vector(0.0, -1.0);
+	segs[0].dir = vector(1.0f, 0.0f);
+	segs[0].dir = vector(-float(M_SQRT1_2), float(M_SQRT1_2));
+	segs[0].dir = vector(0.0f, -1.0f);
 }
 
 tirangle::tirangle(const point* µã)

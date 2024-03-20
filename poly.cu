@@ -33,7 +33,7 @@ __host__ __device__ void sort(double* list, int n, bool up = true)
 
 
 
-void poly::changed() const
+__host__ __device__ void poly::changed() const
 {
 	area_change = true;
 	dir_area_change = true;

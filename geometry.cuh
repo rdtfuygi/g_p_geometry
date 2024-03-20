@@ -199,7 +199,7 @@ protected:
 	mutable bool seg_change;
 	seg segs[20];
 
-	void changed() const;
+	__host__ __device__ void changed() const;
 public:
 
 	__host__ __device__ poly();

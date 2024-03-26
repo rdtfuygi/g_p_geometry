@@ -53,6 +53,7 @@ __host__ __device__ void line::norm()
 	dir /= l;
 }
 
+#ifndef no_opencv
 void line::print(cv::InputOutputArray Í¼Ïñ, float ±ÈÀı, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
 {
 	int ¸ß = Í¼Ïñ.rows(), ¿í = Í¼Ïñ.cols();
@@ -64,87 +65,98 @@ void line::print(cv::InputOutputArray Í¼Ïñ, float ±ÈÀı, const cv::Scalar& ÑÕÉ«, 
 	cv::Point µã_2(origin[0] * ±ÈÀı + dir[0] * ·Å´ó + Ô­µã_x, -origin[1] * ±ÈÀı - dir[1] * ·Å´ó + Ô­µã_y);
 	cv::line(Í¼Ïñ, µã_1, µã_2, ÑÕÉ«, ´ÖÏ¸);
 }
-
+#endif
 
 __host__ __device__ float inc_angle_cos(const line l_1, const line l_2)
 {
 	return l_1.dir * l_2.dir;
 }
 
-DLL __host__ __device__ float inc_angle_sin(const line l_1, const line l_2)
+__host__ __device__ float inc_angle_sin(const line l_1, const line l_2)
 {
 	return l_1.dir ^ l_2.dir;
 }
 
 __host__ __device__ void cross(const line l_1, const line l_2, float& t_1, float& t_2)
 {
-	float ¾ØÕó[2][3] =
-	{
-		{l_1.dir[0],-l_2.dir[0],-l_1.origin[0] + l_2.origin[0]},
-		{l_1.dir[1],-l_2.dir[1],-l_1.origin[1] + l_2.origin[1]}
-	};
-	if (¾ØÕó[0][0] != 0)
-	{
-		float a00 = ¾ØÕó[0][0];
-		float a10 = ¾ØÕó[1][0];
-		for (int i = 0; i < 3; i++)
-		{
-			¾ØÕó[0][i] /= a00;
-			¾ØÕó[1][i] -= ¾ØÕó[0][i] * a10;
-		}
+	//float ¾ØÕó[2][3] =
+	//{
+	//	{l_1.dir[0],-l_2.dir[0],-l_1.origin[0] + l_2.origin[0]},
+	//	{l_1.dir[1],-l_2.dir[1],-l_1.origin[1] + l_2.origin[1]}
+	//};
+	//if (¾ØÕó[0][0] != 0)
+	//{
+	//	float a00 = ¾ØÕó[0][0];
+	//	float a10 = ¾ØÕó[1][0];
+	//	for (int i = 0; i < 3; i++)
+	//	{
+	//		¾ØÕó[0][i] /= a00;
+	//		¾ØÕó[1][i] -= ¾ØÕó[0][i] * a10;
+	//	}
+	//
+	//	if (¾ØÕó[1][1] == 0)
+	//	{
+	//		t_1 = FLT_MAX;
+	//		t_2 = FLT_MAX;
+	//		return;
+	//	}
+	//
+	//	float a01 = ¾ØÕó[0][1];
+	//	float a11 = ¾ØÕó[1][1];
+	//	for (int i = 0; i < 3; i++)
+	//	{
+	//		¾ØÕó[1][i] /= a11;
+	//		¾ØÕó[0][i] -= ¾ØÕó[1][i] * a01;
+	//	}
+	//
+	//	t_1 = ¾ØÕó[0][2];
+	//	t_2 = ¾ØÕó[1][2];
+	//}
+	//else if (¾ØÕó[1][0] != 0)
+	//{
+	//	float a10 = ¾ØÕó[1][0];
+	//	float a00 = ¾ØÕó[0][0];
+	//	for (int i = 0; i < 3; i++)
+	//	{
+	//		¾ØÕó[1][i] /= a10;
+	//		¾ØÕó[0][i] -= ¾ØÕó[1][i] * a00;
+	//	}
+	//
+	//	if (¾ØÕó[0][1] == 0)
+	//	{
+	//		t_1 = FLT_MAX;
+	//		t_2 = FLT_MAX;
+	//		return;
+	//	}
+	//
+	//	float a11 = ¾ØÕó[1][1];
+	//	float a01 = ¾ØÕó[0][1];
+	//	for (int i = 0; i < 3; i++)
+	//	{
+	//		¾ØÕó[0][i] /= a01;
+	//		¾ØÕó[1][i] -= ¾ØÕó[0][i] * a11;
+	//	}
+	//
+	//
+	//	t_2 = ¾ØÕó[0][2];
+	//	t_1 = ¾ØÕó[1][2];
+	//}
+	//else
+	//{
+	//	t_1 = FLT_MAX;
+	//	t_2 = FLT_MAX;
+	//}
 
-		if (¾ØÕó[1][1] == 0)
-		{
-			t_1 = FLT_MAX;
-			t_2 = FLT_MAX;
-			return;
-		}
-
-		float a01 = ¾ØÕó[0][1];
-		float a11 = ¾ØÕó[1][1];
-		for (int i = 0; i < 3; i++)
-		{
-			¾ØÕó[1][i] /= a11;
-			¾ØÕó[0][i] -= ¾ØÕó[1][i] * a01;
-		}
-
-		t_1 = ¾ØÕó[0][2];
-		t_2 = ¾ØÕó[1][2];
-	}
-	else if (¾ØÕó[1][0] != 0)
-	{
-		float a10 = ¾ØÕó[1][0];
-		float a00 = ¾ØÕó[0][0];
-		for (int i = 0; i < 3; i++)
-		{
-			¾ØÕó[1][i] /= a10;
-			¾ØÕó[0][i] -= ¾ØÕó[1][i] * a00;
-		}
-
-		if (¾ØÕó[0][1] == 0)
-		{
-			t_1 = FLT_MAX;
-			t_2 = FLT_MAX;
-			return;
-		}
-
-		float a11 = ¾ØÕó[1][1];
-		float a01 = ¾ØÕó[0][1];
-		for (int i = 0; i < 3; i++)
-		{
-			¾ØÕó[0][i] /= a01;
-			¾ØÕó[1][i] -= ¾ØÕó[0][i] * a11;
-		}
-
-
-		t_2 = ¾ØÕó[0][2];
-		t_1 = ¾ØÕó[1][2];
-	}
-	else
+	float temp = l_1.dir ^ l_2.dir;
+	if (temp == 0.0f)
 	{
 		t_1 = FLT_MAX;
 		t_2 = FLT_MAX;
+		return;
 	}
+	vector oo = vector(l_2.origin) - vector(l_1.origin);
+	t_1 = (oo ^ l_2.dir) / temp;
+	t_2 = (oo ^ l_1.dir) / temp;
 }
 
 __host__ __device__ void cross(const line l_1, const ray l_2, float& t_1, float& t_2)

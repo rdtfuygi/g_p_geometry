@@ -1,26 +1,34 @@
 #pragma once
+#define _USE_MATH_DEFINES 
 
 
 #ifdef GPGEOMETRY_EXPORTS
-#define DLL __declspec(dllexport)
+#define GPGEOMETRY_DLL __declspec(dllexport)
 #else
-#define DLL __declspec(dllimport)//导入
+#define GPGEOMETRY_DLL __declspec(dllimport)//导入
 #endif
 
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
-#include <cmath>
+#include <math.h>
 #include <vector>
+
+#define no_opencv
+
+#ifndef no_opencv
 #include <opencv.hpp>
+#endif 
 
 
-DLL __host__ __device__ float deg2rad(float rad);
-DLL __host__ __device__ float rad2deg(float deg);
 
 
-class DLL point
+GPGEOMETRY_DLL __host__ __device__ float deg2rad(float rad);
+GPGEOMETRY_DLL __host__ __device__ float rad2deg(float deg);
+
+
+class GPGEOMETRY_DLL point
 {
 public:
 	float locat[2];
@@ -29,15 +37,18 @@ public:
 	__host__ __device__ point(float 位置[2]);
 	__host__ __device__ float& operator[](int i);
 	__host__ __device__ float operator[](int i) const;
+
+#ifndef no_opencv
 	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+#endif
 };
 
-DLL __host__ __device__ float length(float 点_1_x, float 点_1_y, float 点_2_x, float 点_2_y);
-DLL __host__ __device__ float length(point 点_1, point 点_2);
+GPGEOMETRY_DLL __host__ __device__ float length(float 点_1_x, float 点_1_y, float 点_2_x, float 点_2_y);
+GPGEOMETRY_DLL __host__ __device__ float length(point 点_1, point 点_2);
 
-DLL __host__ __device__ point rotate(const point 原点, const point 点_2, float 角度, bool rad = false);
+GPGEOMETRY_DLL __host__ __device__ point rotate(const point 原点, const point 点_2, float 角度, bool rad = false);
 
-class DLL vector :public point
+class GPGEOMETRY_DLL vector :public point
 {
 public:
 	__host__ __device__ vector();
@@ -55,28 +66,30 @@ public:
 
 	__host__ __device__ float angle_get(bool rad = false) const;
 
+#ifndef no_opencv
 	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+#endif
 };
 
-DLL __host__ __device__ float inc_angle_cos(vector 向量_1, vector 向量_2);
-DLL __host__ __device__ float inc_angle_sin(vector 向量_1, vector 向量_2);
+GPGEOMETRY_DLL __host__ __device__ float inc_angle_cos(vector 向量_1, vector 向量_2);
+GPGEOMETRY_DLL __host__ __device__ float inc_angle_sin(vector 向量_1, vector 向量_2);
 
-DLL __host__ __device__ vector operator - (vector 向量);
+GPGEOMETRY_DLL __host__ __device__ vector operator - (vector 向量);
 
-DLL __host__ __device__ vector operator + (vector 向量_1, vector 向量_2);
-DLL __host__ __device__ vector operator - (vector 向量_1, vector 向量_2);
-DLL __host__ __device__ vector operator * (vector 向量, float 数);
-DLL __host__ __device__ vector operator * (float 数, vector 向量);
-DLL __host__ __device__ vector operator / (vector 向量, float 数);
+GPGEOMETRY_DLL __host__ __device__ vector operator + (vector 向量_1, vector 向量_2);
+GPGEOMETRY_DLL __host__ __device__ vector operator - (vector 向量_1, vector 向量_2);
+GPGEOMETRY_DLL __host__ __device__ vector operator * (vector 向量, float 数);
+GPGEOMETRY_DLL __host__ __device__ vector operator * (float 数, vector 向量);
+GPGEOMETRY_DLL __host__ __device__ vector operator / (vector 向量, float 数);
 
-DLL __host__ __device__ float operator * (vector 向量_1, vector 向量_2);
-DLL __host__ __device__ float operator ^ (vector 向量_1, vector 向量_2);
+GPGEOMETRY_DLL __host__ __device__ float operator * (vector 向量_1, vector 向量_2);
+GPGEOMETRY_DLL __host__ __device__ float operator ^ (vector 向量_1, vector 向量_2);
 
-DLL __host__ __device__ float length(vector 向量);
+GPGEOMETRY_DLL __host__ __device__ float length(vector 向量);
 
 
 
-class DLL  line
+class GPGEOMETRY_DLL  line
 {
 public:
 	point origin;
@@ -93,10 +106,12 @@ public:
 	__host__ __device__ float point_dist(const point 点) const;
 	__host__ __device__ void norm();
 
+#ifndef no_opencv
 	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+#endif
 };
 
-class DLL  ray :public line
+class GPGEOMETRY_DLL  ray :public line
 {
 public:
 	__host__ __device__ ray();
@@ -106,11 +121,12 @@ public:
 	__host__ __device__ ray(point 点_1, point 点_2);
 	__host__ __device__ ray rotate(const point 点, float 角度, bool rad = false) const;
 	__host__ __device__ float point_dist(const point 点) const;
-
+#ifndef no_opencv
 	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+#endif
 };
 
-class DLL  seg :public ray
+class GPGEOMETRY_DLL  seg :public ray
 {
 public:
 	float dist;
@@ -124,41 +140,43 @@ public:
 	__host__ __device__ float point_dist(const point 点) const;
 	__host__ __device__ void norm();
 
+#ifndef no_opencv
 	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+#endif
 };
 
-DLL __host__ __device__ float inc_angle_cos(const line l_1, const line l_2);
-DLL __host__ __device__ float inc_angle_sin(const line l_1, const line l_2);
-DLL __host__ __device__ void cross(const line l_1, const line l_2, float& t_1, float& t_2);
-DLL __host__ __device__ void cross(const line l_1, const ray l_2, float& t_1, float& t_2);
-DLL __host__ __device__ void cross(const line l_1, const seg l_2, float& t_1, float& t_2);
-DLL __host__ __device__ void cross(const ray l_1, const line l_2, float& t_1, float& t_2);
-DLL __host__ __device__ void cross(const ray l_1, const ray l_2, float& t_1, float& t_2);
-DLL __host__ __device__ void cross(const ray l_1, const seg l_2, float& t_1, float& t_2);
-DLL __host__ __device__ void cross(const seg l_1, const line l_2, float& t_1, float& t_2);
-DLL __host__ __device__ void cross(const seg l_1, const ray l_2, float& t_1, float& t_2);
-DLL __host__ __device__ void cross(const seg l_1, const seg l_2, float& t_1, float& t_2);
-DLL __host__ __device__ point cross(const line l_1, const line l_2);
-DLL __host__ __device__ point cross(const line l_1, const ray l_2);
-DLL __host__ __device__ point cross(const line l_1, const seg l_2);
-DLL __host__ __device__ point cross(const ray l_1, const line l_2);
-DLL __host__ __device__ point cross(const ray l_1, const ray l_2);
-DLL __host__ __device__ point cross(const ray l_1, const seg l_2);
-DLL __host__ __device__ point cross(const seg l_1, const line l_2);
-DLL __host__ __device__ point cross(const seg l_1, const ray l_2);
-DLL __host__ __device__ point cross(const seg l_1, const seg l_2);
-DLL __host__ __device__ bool is_cross(const line l_1, const line l_2);
-DLL __host__ __device__ bool is_cross(const line l_1, const ray l_2);
-DLL __host__ __device__ bool is_cross(const line l_1, const seg l_2);
-DLL __host__ __device__ bool is_cross(const ray l_1, const line l_2);
-DLL __host__ __device__ bool is_cross(const ray l_1, const ray l_2);
-DLL __host__ __device__ bool is_cross(const ray l_1, const seg l_2);
-DLL __host__ __device__ bool is_cross(const seg l_1, const line l_2);
-DLL __host__ __device__ bool is_cross(const seg l_1, const ray l_2);
-DLL __host__ __device__ bool is_cross(const seg l_1, const seg l_2);
+GPGEOMETRY_DLL __host__ __device__ float inc_angle_cos(const line l_1, const line l_2);
+GPGEOMETRY_DLL __host__ __device__ float inc_angle_sin(const line l_1, const line l_2);
+GPGEOMETRY_DLL __host__ __device__ void cross(const line l_1, const line l_2, float& t_1, float& t_2);
+GPGEOMETRY_DLL __host__ __device__ void cross(const line l_1, const ray l_2, float& t_1, float& t_2);
+GPGEOMETRY_DLL __host__ __device__ void cross(const line l_1, const seg l_2, float& t_1, float& t_2);
+GPGEOMETRY_DLL __host__ __device__ void cross(const ray l_1, const line l_2, float& t_1, float& t_2);
+GPGEOMETRY_DLL __host__ __device__ void cross(const ray l_1, const ray l_2, float& t_1, float& t_2);
+GPGEOMETRY_DLL __host__ __device__ void cross(const ray l_1, const seg l_2, float& t_1, float& t_2);
+GPGEOMETRY_DLL __host__ __device__ void cross(const seg l_1, const line l_2, float& t_1, float& t_2);
+GPGEOMETRY_DLL __host__ __device__ void cross(const seg l_1, const ray l_2, float& t_1, float& t_2);
+GPGEOMETRY_DLL __host__ __device__ void cross(const seg l_1, const seg l_2, float& t_1, float& t_2);
+GPGEOMETRY_DLL __host__ __device__ point cross(const line l_1, const line l_2);
+GPGEOMETRY_DLL __host__ __device__ point cross(const line l_1, const ray l_2);
+GPGEOMETRY_DLL __host__ __device__ point cross(const line l_1, const seg l_2);
+GPGEOMETRY_DLL __host__ __device__ point cross(const ray l_1, const line l_2);
+GPGEOMETRY_DLL __host__ __device__ point cross(const ray l_1, const ray l_2);
+GPGEOMETRY_DLL __host__ __device__ point cross(const ray l_1, const seg l_2);
+GPGEOMETRY_DLL __host__ __device__ point cross(const seg l_1, const line l_2);
+GPGEOMETRY_DLL __host__ __device__ point cross(const seg l_1, const ray l_2);
+GPGEOMETRY_DLL __host__ __device__ point cross(const seg l_1, const seg l_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_cross(const line l_1, const line l_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_cross(const line l_1, const ray l_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_cross(const line l_1, const seg l_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_cross(const ray l_1, const line l_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_cross(const ray l_1, const ray l_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_cross(const ray l_1, const seg l_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_cross(const seg l_1, const line l_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_cross(const seg l_1, const ray l_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_cross(const seg l_1, const seg l_2);
 
 
-class DLL tirangle
+class GPGEOMETRY_DLL tirangle
 {
 public:
 	seg segs[3];
@@ -177,11 +195,13 @@ public:
 
 	__host__ __device__ float area() const;
 
+#ifndef no_opencv
 	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+#endif
 };
 
 
-class DLL poly
+class GPGEOMETRY_DLL poly
 {
 protected:
 	mutable bool legal_change;
@@ -234,7 +254,9 @@ public:
 
 	__host__ __device__ float area() const;
 
+#ifndef no_opencv
 	void print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细 = 1) const;
+#endif
 
 	__host__ __device__ point center() const;
 
@@ -245,16 +267,16 @@ public:
 	__host__ __device__ void simple(float 角度 = 30, bool rad = false);
 };
 
-DLL __host__ __device__ bool is_overlap(const poly p_1, const poly p_2);
+GPGEOMETRY_DLL __host__ __device__ bool is_overlap(const poly p_1, const poly p_2);
 
-DLL __host__ __device__ float overlap_area(const poly p_1, const poly p_2);
+GPGEOMETRY_DLL __host__ __device__ float overlap_area(const poly p_1, const poly p_2);
 
-DLL __host__ __device__ float dist(const poly p_1, const poly p_2);
+GPGEOMETRY_DLL __host__ __device__ float dist(const poly p_1, const poly p_2);
 
-DLL __host__ __device__ float dist(const poly p, const line l);
+GPGEOMETRY_DLL __host__ __device__ float dist(const poly p, const line l);
 
-DLL __host__ __device__ float dist(const poly p, const ray l);
+GPGEOMETRY_DLL __host__ __device__ float dist(const poly p, const ray l);
 
-DLL __host__ __device__ float dist(const poly p, const seg l);
+GPGEOMETRY_DLL __host__ __device__ float dist(const poly p, const seg l);
 
 

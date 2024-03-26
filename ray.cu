@@ -34,6 +34,7 @@ __host__ __device__ float ray::point_dist(const point 点) const
 	}
 }
 
+#ifndef no_opencv
 void ray::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细) const
 {
 	int 高 = 图像.rows(), 宽 = 图像.cols();
@@ -45,7 +46,7 @@ void ray::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, i
 	cv::Point 点_2(origin[0] * 比例 + dir[0] * 放大 + 原点_x, -origin[1] * 比例 - dir[1] * 放大 + 原点_y);
 	cv::line(图像, 点_1, 点_2, 颜色, 粗细);
 }
-
+#endif
 
 __host__ __device__ void cross(const ray l_1, const line l_2, float& t_1, float& t_2)
 {

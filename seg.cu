@@ -50,6 +50,7 @@ __host__ __device__ void seg::norm()
 	dist *= l;
 }
 
+#ifndef no_opencv
 void seg::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细) const
 {
 	int 高 = 图像.rows(), 宽 = 图像.cols();
@@ -61,6 +62,7 @@ void seg::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, i
 	cv::Point 点_2(end()[0] * 比例 + 原点_x, -end()[1] * 比例 + 原点_y);
 	cv::line(图像, 点_1, 点_2, 颜色, 粗细);
 }
+#endif
 
 
 __host__ __device__ void cross(const seg l_1, const line l_2, float& t_1, float& t_2)

@@ -27,7 +27,7 @@ __host__ __device__ float point::operator[](int i) const
 {
 	return locat[i & 1];
 }
-
+#ifndef no_opencv
 void point::print(cv::InputOutputArray Í¼Ïñ, float ±ÈÀý, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
 {
 	int ¸ß = Í¼Ïñ.rows(), ¿í = Í¼Ïñ.cols();
@@ -39,3 +39,4 @@ void point::print(cv::InputOutputArray Í¼Ïñ, float ±ÈÀý, const cv::Scalar& ÑÕÉ«,
 
 	cv::circle(Í¼Ïñ, µã, ´ÖÏ¸, ÑÕÉ«, -1);
 }
+#endif

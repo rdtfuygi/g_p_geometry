@@ -1,4 +1,4 @@
-#define _USE_MATH_DEFINES 
+
 
 #include "geometry.cuh"
 #include <limits>
@@ -6,19 +6,19 @@
 
 __host__ __device__ float deg2rad(float rad)
 {
-	return rad * M_PI / 180;
+	return rad * float(M_PI) / 180;
 }
 
 __host__ __device__ float rad2deg(float deg)
 {
-	return deg / M_PI * 180;
+	return deg / float(M_PI) * 180;
 }
 
 
 
 __host__ __device__ float length(float 点_1_x, float 点_1_y, float 点_2_x, float 点_2_y)
 {
-	return sqrt(pow(点_1_x - 点_2_x, 2) + pow(点_1_y - 点_2_y, 2));
+	return sqrt(powf(点_1_x - 点_2_x, 2) + powf(点_1_y - 点_2_y, 2));
 }
 
 __host__ __device__ float length(point 点_1, point 点_2)

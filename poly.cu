@@ -102,13 +102,13 @@ __host__ __device__ bool poly::legal() const
 	{
 		for (int j = 0; j < i - 1; j++)
 		{
-			if ((segs[i].dist < 0.001) || (segs[j].dist < 0.001))
+			if ((segs[i].dist < 0.001f) || (segs[j].dist < 0.001f))
 			{
 				continue;
 			}
 			float t1, t2;
 			cross(segs[i], segs[j], t1, t2);
-			if ((t2 > 0.001) && (t2 < segs[j].dist - 0.001))
+			if ((t2 > 0.001f) && (t2 < segs[j].dist - 0.001f))
 			{
 				legal_= false;
 				return false;
@@ -117,13 +117,13 @@ __host__ __device__ bool poly::legal() const
 	}
 	for (int j = 1; j < 18; j++)
 	{
-		if ((segs[19].dist < 0.001) || (segs[j].dist < 0.001))
+		if ((segs[19].dist < 0.001f) || (segs[j].dist < 0.001f))
 		{
 			continue;
 		}
 		float t1, t2;
 		cross(segs[19], segs[j], t1, t2);
-		if ((t2 > 0.001) && (t2 < segs[j].dist - 0.001))
+		if ((t2 > 0.001) && (t2 < segs[j].dist - 0.001f))
 		{
 			legal_ = false;
 			return false;
@@ -393,7 +393,7 @@ __host__ __device__ void poly::reset_seg()
 
 	for (int i = 0, n = 0; (i < 20 - 1) && (n < 20); i++)
 	{
-		if ((abs(segs[i].origin[0] - segs[i + 1].origin[0]) > 0.001) || (abs(segs[i].origin[1] - segs[i + 1].origin[1]) > 0.001))
+		if ((abs(segs[i].origin[0] - segs[i + 1].origin[0]) > 0.001f) || (abs(segs[i].origin[1] - segs[i + 1].origin[1]) > 0.001f))
 		{
 			continue;
 		}
@@ -624,7 +624,7 @@ __host__ __device__ float poly::area() const
 	area_ = output;
 	return output;
 }
-
+#ifndef no_opencv
 void poly::print(cv::InputOutputArray Í¼Ïñ, float ±ÈÀý, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
 {
 	//seg(segs[0].origin, segs[1].origin).print(Í¼Ïñ, ±ÈÀý, ÑÕÉ«, ´ÖÏ¸ * 2);
@@ -635,7 +635,7 @@ void poly::print(cv::InputOutputArray Í¼Ïñ, float ±ÈÀý, const cv::Scalar& ÑÕÉ«, 
 	seg(segs[19].origin, segs[0].origin).print(Í¼Ïñ, ±ÈÀý, ÑÕÉ«, ´ÖÏ¸);
 	//segs[0].origin.print(Í¼Ïñ, ±ÈÀý, ÑÕÉ«, ´ÖÏ¸ * 4);
 }
-
+#endif
 __global__ void poly_center(seg* segs, float min_x, float min_y, float max_x, float max_y, float* p_area, float* x_, float* y_)
 {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -688,7 +688,7 @@ __global__ void poly_center(seg* segs, float min_x, float min_y, float max_x, fl
 			break;
 		}
 		p_area[idx] += dist[2 * i + 1] - dist[2 * i];
-		y_[idx] += pow(dist[2 * i + 1] + min[1], 2) - pow(dist[2 * i] + min[1], 2);
+		y_[idx] += powf(dist[2 * i + 1] + min[1], 2) - powf(dist[2 * i] + min[1], 2);
 	}
 	x_[idx] = p_area[idx] * x;
 }
@@ -788,7 +788,7 @@ __host__ __device__ point poly::center() const
 			}
 			p_area += dist[2 * i + 1] - dist[2 * i];
 			d_x += dist[2 * i + 1] - dist[2 * i];
-			y_ += pow(dist[2 * i + 1] + min[1], 2) - pow(dist[2 * i] + min[1], 2);
+			y_ += powf(dist[2 * i + 1] + min[1], 2) - powf(dist[2 * i] + min[1], 2);
 		}
 		x_ += d_x * x;
 	}
@@ -806,7 +806,7 @@ __host__ __device__ point poly::fast_center() const
 	fast_center_change = false;
 
 	float s = 0;
-	point center__(0.0, 0.0);
+	point center__(0.0f, 0.0f);
 	for (int i = 0; i < 19; i++)
 	{
 		float a = vector(segs[i].origin) ^ vector(segs[i + 1].origin);
@@ -832,6 +832,9 @@ vector poly::move2center()
 		segs[i].origin = point(vector(segs[i].origin) - move);
 	}
 
+	center_ = point(0.0, 0.0);
+	fast_center_ = point(0.0, 0.0);
+
 	return vector(0.0f, 0.0f) - move;
 }
 
@@ -855,7 +858,7 @@ __host__ __device__ void poly::simple(float ½Ç¶È, bool rad)
 			i = j - 1;
 
 			float cos_t = (vector(0.0f, 0.0f) - segs[i].dir) * segs[j].dir;
-			if ((cos_t < cos_) || (segs[i].dist < 0.0001) || (segs[j].dist < 0.0001))
+			if ((cos_t < cos_) || (segs[i].dist < 0.0001f) || (segs[j].dist < 0.0001f))
 			{
 				continue;
 			}
@@ -878,7 +881,7 @@ __host__ __device__ void poly::simple(float ½Ç¶È, bool rad)
 		vector dir_;
 		for (int i = 19; i >= 0; i--)
 		{
-			if (segs[i].dist > 0.0001)
+			if (segs[i].dist > 0.0001f)
 			{
 				dir_ = segs[i].dir;
 				break;

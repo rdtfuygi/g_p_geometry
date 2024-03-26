@@ -83,6 +83,7 @@ __host__ __device__ float vector::angle_get(bool rad) const
 	return 角度;
 }
 
+#ifndef no_opencv
 void vector::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细) const
 {
 	int 高 = 图像.rows(), 宽 = 图像.cols();
@@ -94,6 +95,7 @@ void vector::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色
 	cv::Point 点_2(locat[0] * 比例 + 原点_x, -locat[1] * 比例  + 原点_y);
 	cv::line(图像, 点_1, 点_2, 颜色, 粗细);
 }
+#endif
 
 __host__ __device__ float inc_angle_cos(vector 向量_1, vector 向量_2)
 {	

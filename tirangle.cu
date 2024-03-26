@@ -5,9 +5,9 @@
 
 tirangle::tirangle()
 {
-	segs[0].origin = point(0.0, 0.0);
-	segs[1].origin = point(1.0, 0.0);
-	segs[2].origin = point(0.0, 1.0);
+	segs[0].origin = point(0.0f, 0.0f);
+	segs[1].origin = point(1.0f, 0.0f);
+	segs[2].origin = point(0.0f, 1.0f);
 	segs[0].dir = vector(1.0f, 0.0f);
 	segs[0].dir = vector(-float(M_SQRT1_2), float(M_SQRT1_2));
 	segs[0].dir = vector(0.0f, -1.0f);
@@ -60,10 +60,11 @@ __host__ __device__ float tirangle::area() const
 {
 	return abs((vector(segs[1].origin) - vector(segs[0].origin)) ^ (vector(segs[2].origin) - vector(segs[0].origin))) / 2;
 }
-
+#ifndef no_opencv
 void tirangle::print(cv::InputOutputArray Í¼Ïñ, float ±ÈÀı, const cv::Scalar& ÑÕÉ«, int ´ÖÏ¸) const
 {
 	seg(segs[0].origin, segs[1].origin).print(Í¼Ïñ, ±ÈÀı, ÑÕÉ«, ´ÖÏ¸);
 	seg(segs[1].origin, segs[2].origin).print(Í¼Ïñ, ±ÈÀı, ÑÕÉ«, ´ÖÏ¸);
 	seg(segs[2].origin, segs[0].origin).print(Í¼Ïñ, ±ÈÀı, ÑÕÉ«, ´ÖÏ¸);
 }
+#endif

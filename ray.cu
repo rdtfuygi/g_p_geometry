@@ -70,6 +70,17 @@ __host__ __device__ void cross(const ray l_1, const ray l_2, float& t_1, float& 
 
 __host__ __device__ void cross(const ray l_1, const seg l_2, float& t_1, float& t_2)
 {
+	point end_1 = point((l_1.dir[0] > 0 ? FLT_MAX : -FLT_MAX), (l_1.dir[1] > 0 ? FLT_MAX : -FLT_MAX));
+	point end_2 = l_2.end();
+	if ((fmin(l_1.origin[0], end_1[0]) > fmax(l_2.origin[0], end_2[0])) ||
+		(fmin(l_1.origin[1], end_1[1]) > fmax(l_2.origin[1], end_2[1])) ||
+		(fmin(l_2.origin[0], end_2[0]) > fmax(l_1.origin[0], end_1[0])) ||
+		(fmin(l_2.origin[1], end_2[1]) > fmax(l_1.origin[1], end_1[1])))
+	{
+		t_2 = FLT_MAX;
+		t_1 = FLT_MAX;
+		return;
+	}
 	cross(line(l_1), line(l_2), t_1, t_2);
 	if ((0 > t_1) || (0 > t_2) || (t_2 > l_2.dist))
 	{

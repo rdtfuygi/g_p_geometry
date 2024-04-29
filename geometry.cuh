@@ -15,7 +15,7 @@
 #include <math.h>
 #include <vector>
 
-#define no_opencv
+//#define no_opencv
 
 #ifndef no_opencv
 #include <opencv.hpp>
@@ -217,13 +217,13 @@ protected:
 	mutable point fast_center_;
 
 	mutable bool seg_change;
-	seg segs[20];
+	seg segs[16];
 
 	__host__ __device__ void changed() const;
 public:
 
 	__host__ __device__ poly();
-	__host__ __device__ poly(const point* 点, int m = 20);
+	__host__ __device__ poly(const point* 点, int m = 16);
 	poly(std::vector<point>& 点);
 	__host__ __device__ poly(const tirangle 三角);
 

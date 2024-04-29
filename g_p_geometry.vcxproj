@@ -171,7 +171,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="geometry.cuh" />
-    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="geometry.cu">

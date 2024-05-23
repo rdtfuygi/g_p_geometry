@@ -164,6 +164,8 @@
       <MaxRegCount>32</MaxRegCount>
       <FastMath>true</FastMath>
       <Optimization>O2</Optimization>
+      <InterleaveSourceInPTX>false</InterleaveSourceInPTX>
+      <PtxAsOptionV>false</PtxAsOptionV>
     </CudaCompile>
     <CudaLink>
       <Optimization>O2</Optimization>

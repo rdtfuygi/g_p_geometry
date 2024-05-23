@@ -89,7 +89,6 @@ poly::poly(const tirangle 三角)
 	segs[0] = 三角.segs[0];
 	segs[1] = 三角.segs[1];
 	segs[2] = 三角.segs[2];
-	reset_seg();
 
 	changed();
 }
@@ -439,6 +438,7 @@ __host__ __device__ float poly::area() const
 	area_ = output;
 	return output;
 }
+
 #ifndef no_opencv
 void poly::print(cv::InputOutputArray 图像, float 比例, const cv::Scalar& 颜色, int 粗细) const
 {
@@ -745,10 +745,10 @@ __host__ __device__ bool is_overlap(const poly p_1, const poly p_2)
 		{
 			return true;
 		}
-		if (p_2.point_in(p_1[i].origin))
-		{
-			return true;
-		}
+	}
+	if (p_2.point_in(p_1[0].origin))
+	{
+		return true;
 	}
 	return false;
 }
